@@ -660,8 +660,6 @@ async function render(){
       G("Tìm rộng trên web, cần tự kiểm tra nguồn",[["Google: tìm file PDF","https://www.google.com/search?q="+q+"+filetype%3Apdf"],["Google: luận văn PDF","https://www.google.com/search?q="+q+"+thesis+OR+dissertation+filetype%3Apdf"],["ResearchGate (qua Google)","https://www.google.com/search?q="+q+"+site%3Aresearchgate.net"]]);
   }else{h=shelfHtml()}
   if(tok!==S.tok)return;
-  const loi=[...oaLoi].filter(c=>c!==200);
-  if(loi.length)top+=msg(`OpenAlex đang giới hạn lượt tra cứu (mã ${loi.sort().join(", ")}), nên mình đã lấy kết quả từ Crossref thay thế. Phần chủ đề và bài liên quan có thể chưa hiện đủ.`,true);
   draw(top+nav+h);
 }
 
