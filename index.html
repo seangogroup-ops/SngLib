@@ -243,7 +243,7 @@ const IC={link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10
 const ic=(n,c="")=>`<svg class="ic${n==="bmf"?" f":""}${c?" "+c:""}" viewBox="0 0 24 24">${IC[n==="bmf"?"bm":n]}</svg>`;
 const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const E=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const norm=s=>(s||"").toLowerCase().replace(/\W+/g,"");
+const norm=s=>(s||"").toLowerCase().replace(/[^\p{L}\p{N}]+/gu,"");
 const STYLES=["APA","Harvard","MLA","IEEE"],STK="singlib_style_v1";
 let S={q:"",y1:1990,y2:NOW,pdf:false,kt:0,tab:0,kieu:"Bảng",apa:false,kq:null,pg:{},tok:0,dp:new Set(),sort:"Liên quan",shelf:[]};
 try{const v=localStorage.getItem(STK);S.style=STYLES.includes(v)?v:"APA"}catch(e){S.style="APA"}
@@ -304,17 +304,35 @@ function fromCR(it){
 }
 const diem=c=>{let d=0;if(["article","journal-article","review"].includes(c.loai)&&["journal",""].includes(c.nl))d+=2;
   if(["repository","ebook platform"].includes(c.nl))d-=1;if(["preprint","posted-content"].includes(c.loai))d-=3;if(c.doi)d+=1;return d+Math.log1p(c.cites||0)};
-const xep=l=>[...l].sort((a,b)=>diem(b)-diem(a));
+/* ---------- Độ liên quan với từ khóa ---------- */
+const STOP=new Set("và,các,của,những,là,có,trong,đến,để,với,cho,về,tại,từ,một,được,khi,này,đó,như,theo,bởi,do,hay,hoặc,nên,thì,mà,ở,tới,qua,giữa,the,and,of,in,on,for,to,a,an,with,by,from,at,is,are,as,its,their".split(","));
+const toks=s=>String(s||"").toLowerCase().match(/[\p{L}\p{N}]+/gu)||[];
+const keys=q=>{const t=toks(q),k=t.filter(w=>!STOP.has(w)&&(w.length>1||/\d/.test(w)));return k.length?k:t};
+const sach=q=>{const k=keys(q);return k.length>=2?k.join(" "):q};
+function xep(l,q){
+  const t0=toks(q),k=[...new Set(keys(q))];if(!k.length||l.length<2)return[...l];
+  const T=new Map(l.map(c=>{const ti=toks(c.tieu),ab=toks(c.abstract);return[c,{ti,ts:new Set(ti),as:new Set(ab),tl:" "+ti.join(" ")+" ",al:" "+ab.join(" ")+" "}]}));
+  /* từ nào xuất hiện ở hầu hết kết quả (vd "yếu tố ảnh hưởng") thì ít giá trị phân biệt */
+  const df={};for(const w of k)df[w]=l.filter(c=>{const d=T.get(c);return d.ts.has(w)||d.as.has(w)}).length;
+  const w=Object.fromEntries(k.map(x=>[x,l.length<8?1:Math.max(.15,Math.log((l.length+1)/(df[x]+.5)))]));
+  const W=k.reduce((a,x)=>a+w[x],0),pairs=[];
+  for(let i=0;i<t0.length-1;i++)if(!STOP.has(t0[i])&&!STOP.has(t0[i+1]))pairs.push(" "+t0[i]+" "+t0[i+1]+" ");
+  const rel=c=>{const d=T.get(c);let s=0;for(const x of k)s+=w[x]*(d.ts.has(x)?1:d.as.has(x)?.5:0);s/=W;
+    if(pairs.length){let b=0;for(const p of pairs)b+=d.tl.includes(p)?1:d.al.includes(p)?.5:0;s+=b/pairs.length}return s};
+  const R=new Map(l.map(c=>[c,rel(c)])),sc=c=>R.get(c)*5+diem(c)*.3;
+  let L=l.filter(c=>R.get(c)>=.4);if(L.length<3)L=[...l];
+  return L.sort((a,b)=>sc(b)-sc(a));
+}
 function gop(...ls){const seen=new Set(),out=[],n=Math.max(0,...ls.map(l=>l.length));
   for(let i=0;i<n;i++)for(const l of ls){const c=l[i];if(!c)continue;const k=c.doi||norm(c.tieu);if(k&&!seen.has(k)){seen.add(k);out.push(c)}}return out}
 
 async function timOA(q,y1,y2,{oaOnly=false,extra="",sort="",per=BATCH,page=1}={}){
   const f=`publication_year:${y1}-${y2}`+(oaOnly?",open_access.is_oa:true":"")+(extra?","+extra:"");
-  const p={search:q,filter:f,"per-page":per,page};if(sort)p.sort=sort;
+  const p={search:sach(q),filter:f,"per-page":per,page};if(sort)p.sort=sort;
   const d=await oa("works",p);return d?(d.results||[]).map(fromOA):[];
 }
 async function timCR(q,y1,y2,{types=[],offset=0,rows=BATCH,sort=""}={}){
-  const p={"query.bibliographic":q,rows,offset,filter:`from-pub-date:${y1},until-pub-date:${y2}`+types.map(t=>",type:"+t).join(""),
+  const p={"query.bibliographic":sach(q),rows,offset,filter:`from-pub-date:${y1},until-pub-date:${y2}`+types.map(t=>",type:"+t).join(""),
     select:"DOI,title,author,issued,container-title,abstract,link,URL,is-referenced-by-count,type",mailto:MAIL};
   if(sort){p.sort=sort;p.order="desc"}
   const d=await jget(CR+"?"+new URLSearchParams(p));return d?((d.message||{}).items||[]).map(fromCR).filter(Boolean):[];
@@ -495,12 +513,12 @@ const papers=(fn,tx=true)=>Src(async b=>{const l=await fn(b);return l.map((c,i)=
 function buildKq(){
   const {q,y1,y2,pdf}=S;
   S.kq={
-    bai:papers(async b=>{const[a,c]=await Promise.all([timOA(q,y1,y2,{oaOnly:pdf,page:b}),timCR(q,y1,y2,{offset:(b-1)*BATCH})]);return xep(gop(a,c))}),
+    bai:papers(async b=>{const[a,c]=await Promise.all([timOA(q,y1,y2,{oaOnly:pdf,page:b}),timCR(q,y1,y2,{offset:(b-1)*BATCH})]);return xep(gop(a,c),q)}),
     cite:papers(async b=>{const a=await timOA(q,y1,y2,{sort:"cited_by_count:desc",page:b});return a.length?a:timCR(q,y1,y2,{offset:(b-1)*BATCH,sort:"is-referenced-by-count"})},false),
     lq:papers(async b=>{if(b>1)return[];const a=await timOA(q,y1,y2,{oaOnly:pdf});
       const ids=[...new Set(a.filter(c=>c.related.length).slice(0,3).flatMap(c=>c.related.slice(0,8).map(lastId)))].slice(0,25);
       if(!ids.length)return[];const d=await oa("works",{filter:"openalex:"+ids.join("|"),"per-page":25});return d?(d.results||[]).map(fromOA):[]},false),
-    lv:LOAI_TL.map(([,o,cr])=>papers(async b=>{const[a,c]=await Promise.all([timOA(q,1990,y2,{extra:"type:"+o,page:b}),timCR(q,1990,y2,{types:cr,offset:(b-1)*BATCH})]);return xep(gop(a,c))},false)),
+    lv:LOAI_TL.map(([,o,cr])=>papers(async b=>{const[a,c]=await Promise.all([timOA(q,1990,y2,{extra:"type:"+o,page:b}),timCR(q,1990,y2,{types:cr,offset:(b-1)*BATCH})]);return xep(gop(a,c),q)},false)),
     tcs:Src(async b=>b>1?[]:groupTC(),true),tgs:Src(async b=>b>1?[]:groupTG(),true),cds:Src(async b=>b>1?[]:groupCD(),true)
   };
 }
