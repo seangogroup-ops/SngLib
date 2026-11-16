@@ -2,6 +2,6 @@
    Anon / publishable key là khóa công khai, được bảo vệ bởi RLS trong supabase/schema.sql.
    TUYỆT ĐỐI không dán service_role key vào đây. */
 window.SNGLIB = {
-  SUPABASE_URL: "",       // ví dụ: https://abcdxyz.supabase.co
+  SUPABASE_URL: "https://wtqpngegoutcjdhlpsds.supabase.co",
   SUPABASE_ANON_KEY: ""   // ví dụ: eyJhbGciOi... hoặc sb_publishable_...
 };

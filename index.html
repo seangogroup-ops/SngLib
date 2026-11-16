@@ -206,6 +206,7 @@ a{color:inherit}
 }
 @media (max-width:1000px){.col{max-width:none}}
 @media (max-width:768px){.cl{display:block;-webkit-line-clamp:unset;cursor:default}}
+.strip .btn{align-self:center}
 </style>
 </head>
 <body>
@@ -226,6 +227,7 @@ a{color:inherit}
     </div>
     <div class="years" id="yrs" hidden>Từ năm <input type="number" id="y1" value="2018" min="1900"> đến năm <input type="number" id="y2" min="1900"></div>
     <main id="main"></main>
+    <input type="file" id="imp" accept=".json,application/json" hidden>
   </div>
 </div>
 <script>
@@ -237,12 +239,14 @@ const TABS=["Bài báo","Bài liên quan","Tạp chí","Luận văn, sách, báo
 const VI_DU=["academic stress university students","online learning engagement","sleep quality adolescents"];
 const LOAI_TL=[["Luận văn, luận án","dissertation",["dissertation"]],["Sách và chương sách","book|book-chapter",["book","monograph","edited-book","book-chapter"]],["Báo cáo","report",["report"]]];
 const LINK_NHAN={"Link PDF":"PDF","Link bài viết":"Mở bài","Trang chủ tạp chí":"Mở trang","Trang OpenAlex":"Mở","Trang tác giả":"Mở hồ sơ","Tra cứu tạp chí":"Mở","Tra cứu tác giả":"Mở"};
-const IC={doc:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',rel:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',jr:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',thesis:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/>',users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.3c1.8.8 3 2.7 3 5.7"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/>',dl:'<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/>',bm:'<path d="M6 4h12v16l-6-4-6 4z"/>',ext:'<path d="M8 16L17 7M9 7h8v8"/>',pdf:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/>',l:'<path d="M15 6l-6 6 6 6"/>',r:'<path d="M9 6l6 6-6 6"/>',trash:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>'};
+const IC={link:'<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/>',up:'<path d="M12 16V4M7 9l5-5 5 5M5 20h14"/>',doc:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',rel:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',jr:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',thesis:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/>',users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.3c1.8.8 3 2.7 3 5.7"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/>',dl:'<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/>',bm:'<path d="M6 4h12v16l-6-4-6 4z"/>',ext:'<path d="M8 16L17 7M9 7h8v8"/>',pdf:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/>',l:'<path d="M15 6l-6 6 6 6"/>',r:'<path d="M9 6l6 6-6 6"/>',trash:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>'};
 const ic=(n,c="")=>`<svg class="ic${n==="bmf"?" f":""}${c?" "+c:""}" viewBox="0 0 24 24">${IC[n==="bmf"?"bm":n]}</svg>`;
 const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const E=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const norm=s=>(s||"").toLowerCase().replace(/\W+/g,"");
+const STYLES=["APA","Harvard","MLA","IEEE"],STK="singlib_style_v1";
 let S={q:"",y1:1990,y2:NOW,pdf:false,kt:0,tab:0,kieu:"Bảng",apa:false,kq:null,pg:{},tok:0,dp:new Set(),sort:"Liên quan",shelf:[]};
+try{const v=localStorage.getItem(STK);S.style=STYLES.includes(v)?v:"APA"}catch(e){S.style="APA"}
 const SK="singlib_shelf_v1",RK="singlib_recent_v1",REG=new Map();
 const CMP={"Liên quan":null,"Trích dẫn":(a,b)=>(b._cites||0)-(a._cites||0),"Mới nhất":(a,b)=>(+b._nam||0)-(+a._nam||0)};
 const keyOf=r=>r._doi||norm(r._tieu);
@@ -256,7 +260,6 @@ const svCell=r=>`<td class="l" data-label="Kệ">${svBtn(r)}</td>`;
 const TIC=["doc","rel","jr","thesis","users","globe","bm"];
 function drawTabs(){const a=S.kq||S.tab===6?S.tab:-1;$("#tabs").innerHTML=TABS.map((t,i)=>`<button data-tab="${i}" class="${i===a?"on":""}">${ic(TIC[i])}<span>${t}</span>${i===6?`<em id="shc">${S.shelf.length}</em>`:""}</button>`).join("")}
 function updShelf(){$("#shn").textContent=S.shelf.length;const c=$("#shc");if(c)c.textContent=S.shelf.length}
-const apaDoc=rows=>`<html><head><meta charset="utf-8"><title>Tài liệu tham khảo</title></head><body style="font-family:'Times New Roman',serif;font-size:12pt;line-height:2"><h3>Tài liệu tham khảo</h3>${rows.map(r=>apa(r)).sort((a,b)=>plain(a).localeCompare(plain(b))).map(x=>`<p style="margin-left:36pt;text-indent:-36pt">${x}</p>`).join("")}</body></html>`;
 
 /* ---------- Gọi API ---------- */
 const cache=new Map();let oaPause=0;const oaLoi=new Set();
@@ -354,6 +357,128 @@ function apa(r,html=true){
   return o;
 }
 
+/* ---------- Các chuẩn trích dẫn khác (Harvard, MLA, IEEE) ---------- */
+const nameList=ds=>(ds||[]).filter(a=>a&&a[0]);
+const tenIe=([f,g])=>{const v=vietTat(g);return v?`${v} ${f}`:f};
+function dsHarvard(ds){const n=nameList(ds).map(tenApa);if(!n.length)return"";if(n.length>3)return n[0]+" et al.";return n.length===1?n[0]:n.slice(0,-1).join(", ")+" and "+n.at(-1)}
+function dsMla(ds){const n=nameList(ds),full=([f,g])=>g?`${f}, ${g}`:f,rev=([f,g])=>g?`${g} ${f}`:f;
+  if(!n.length)return"";if(n.length===1)return full(n[0]);if(n.length===2)return`${full(n[0])}, and ${rev(n[1])}`;return full(n[0])+", et al."}
+function dsIeee(ds){const n=nameList(ds).map(tenIe);if(!n.length)return"";if(n.length>6)return n[0]+" et al.";if(n.length===1)return n[0];
+  if(n.length===2)return n[0]+" and "+n[1];return n.slice(0,-1).join(", ")+", and "+n.at(-1)}
+function cite(r,html=true,style=S.style){
+  if(style==="APA"||!STYLES.includes(style))return apa(r,html);
+  const e=html?E:(x=>x),it=t=>html?`<i>${E(t)}</i>`:t,ln=u=>html?`<a href="${E(u)}" target="_blank" rel="noopener">${E(u)}</a>`:u;
+  const nam=r._nam?String(r._nam):"n.d.",tieu=(r._tieu||"").trim().replace(/\.$/,""),tc=(r._tc||"").trim();
+  const link=r._doi?"https://doi.org/"+r._doi:(r["Link bài viết"]||r["Link PDF"]||"");
+  if(style==="Harvard"){
+    const tg=dsHarvard(r._ds);
+    return(tg?`${e(tg)} (${nam}) ‘${e(tieu)}’`:`‘${e(tieu)}’ (${nam})`)+(tc?", "+it(tc):"")+"."+(link?" Available at: "+ln(link):"");
+  }
+  if(style==="MLA"){
+    const tg=dsMla(r._ds);
+    return(tg?e(tg.endsWith(".")?tg:tg+".")+" ":"")+`“${e(tieu)}.” `+(tc?it(tc)+", ":"")+nam+(link?", "+ln(link):"")+".";
+  }
+  const tg=dsIeee(r._ds);   // IEEE
+  return(tg?e(tg)+", ":"")+`“${e(tieu)},” `+(tc?it(tc)+", ":"")+nam+(r._doi?", doi: "+e(r._doi)+".":(link?". [Online]. Available: "+ln(link):"."));
+}
+const styleSeg=()=>`<div class="seg" title="Chuẩn trích dẫn">${STYLES.map(k=>`<button type="button" data-cs="${k}" class="${S.style===k?"on":""}">${k}</button>`).join("")}</div>`;
+function refList(rows,style=S.style){
+  const L=rows.map(r=>cite(r,true,style));
+  return style==="IEEE"?L.map((x,i)=>`[${i+1}] ${x}`):L.sort((a,b)=>plain(a).localeCompare(plain(b)));
+}
+function refDoc(rows,style=S.style){
+  const ps=refList(rows,style).map(x=>`<p style="margin-left:36pt;text-indent:-36pt">${x}</p>`).join("");
+  return`<html><head><meta charset="utf-8"><title>Tài liệu tham khảo</title></head><body style="font-family:'Times New Roman',serif;font-size:12pt;line-height:2"><h3>Tài liệu tham khảo (${style})</h3>${ps}</body></html>`;
+}
+
+/* ---------- Xuất BibTeX, RIS ---------- */
+const fold=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/đ/g,"d").replace(/Đ/g,"D");
+const one=s=>String(s??"").replace(/[\r\n]+/g," ").trim();
+const bibEsc=s=>one(s).replace(/[{}]/g,"").replace(/([&%$#_])/g,"\\$1");
+const tacGia=r=>nameList(r._ds).map(([f,g])=>g?`${f}, ${g}`:f);
+function bibType(r){
+  const t=String(r._loai||"").toLowerCase();
+  if(/chapter/.test(t))return"incollection";
+  if(/^(book|monograph|edited-book|reference-book)$/.test(t))return"book";
+  if(/dissertation|thesis/.test(t))return"phdthesis";
+  if(/report/.test(t))return"techreport";
+  if(/proceedings|conference/.test(t))return"inproceedings";
+  return r._tc?"article":"misc";
+}
+const BIB_TC={article:"journal",incollection:"booktitle",inproceedings:"booktitle",book:"publisher",phdthesis:"school",techreport:"institution",misc:"howpublished"};
+function bibtex(rows){
+  const used=new Set();
+  return rows.map(r=>{
+    const f=fold((r._ds&&r._ds[0]||[])[0]).replace(/[^A-Za-z]/g,"")||"anon";
+    const w=fold(r._tieu).split(/\s+/).map(x=>x.replace(/[^A-Za-z]/g,"")).find(x=>x.length>3)||"";
+    const base=f+(r._nam||"nd")+w.toLowerCase().slice(0,12);let k=base,i=0;
+    while(used.has(k))k=base+"_"+(++i);used.add(k);
+    const t=bibType(r),F=[],au=tacGia(r).map(bibEsc).join(" and ");
+    if(au)F.push(["author",au]);
+    F.push(["title","{"+bibEsc(r._tieu)+"}"]);
+    if(r._tc)F.push([BIB_TC[t],bibEsc(r._tc)]);
+    if(/^\d{4}$/.test(String(r._nam)))F.push(["year",String(r._nam)]);
+    if(r._doi)F.push(["doi",one(r._doi)]);
+    const u=r["Link bài viết"]||r["Link PDF"]||"";if(u&&!r._doi)F.push(["url",one(u)]);
+    return`@${t}{${k},\n`+F.map(([a,b])=>`  ${a} = {${b}}`).join(",\n")+"\n}";
+  }).join("\n\n")+"\n";
+}
+const RIS_T={article:"JOUR",book:"BOOK",incollection:"CHAP",phdthesis:"THES",techreport:"RPRT",inproceedings:"CONF",misc:"GEN"};
+function ris(rows){
+  return rows.map(r=>{
+    const L=["TY  - "+RIS_T[bibType(r)]];
+    tacGia(r).forEach(a=>L.push("AU  - "+one(a)));
+    L.push("TI  - "+one(r._tieu));
+    if(r._tc)L.push("T2  - "+one(r._tc));
+    if(/^\d{4}$/.test(String(r._nam)))L.push("PY  - "+r._nam);
+    if(r._doi)L.push("DO  - "+one(r._doi));
+    const u=r["Link bài viết"]||r["Link PDF"]||"";if(u)L.push("UR  - "+one(u));
+    L.push("ER  - ");return L.join("\r\n");
+  }).join("\r\n")+"\r\n";
+}
+
+/* ---------- Nhập Kệ sách từ file sao lưu ---------- */
+function cleanRow(x){
+  if(!x||typeof x!=="object"||Array.isArray(x))return null;
+  const bad=/^\s*(javascript|data|vbscript):/i,o={};
+  for(const[k,v]of Object.entries(x)){
+    if(k==="__proto__")continue;
+    if(k==="_ds"){o._ds=Array.isArray(v)?v.slice(0,200).map(a=>Array.isArray(a)?[String(a[0]??"").slice(0,120),String(a[1]??"").slice(0,120)]:["",""]):[];continue}
+    if(typeof v==="number"&&isFinite(v))o[k]=v;
+    else if(typeof v==="string"&&!bad.test(v))o[k]=v.slice(0,6000);
+  }
+  if(!o._ds)o._ds=[];
+  return o;
+}
+
+/* ---------- Link chia sẻ: lưu trạng thái tìm kiếm vào #hash ---------- */
+function syncHash(){
+  const p=new URLSearchParams();
+  if(S.kq&&S.q){
+    p.set("q",S.q);const k=KHOANG[S.kt][1];
+    if(k==="x"){p.set("y1",S.y1);p.set("y2",S.y2)}else if(S.kt)p.set("kt",S.kt);
+    if(S.pdf)p.set("pdf","1");
+  }
+  if(S.tab&&(S.kq||S.tab===6))p.set("t",S.tab);
+  const h=p.toString();
+  try{history.replaceState(null,"",location.pathname+location.search+(h?"#"+h:""))}catch(e){}
+}
+function applyHash(h){
+  const p=new URLSearchParams((h||"").replace(/^#/,"")),q=(p.get("q")||"").trim().slice(0,300),t=+p.get("t")||0;
+  if(!q){if(t===6){S.tab=6;shelfHome();drawTabs()}return}
+  const iX=KHOANG.findIndex(x=>x[1]==="x"),cl=y=>Math.min(NOW,Math.max(1900,Math.round(y)));
+  const y1=+p.get("y1"),y2=+p.get("y2"),kt=+p.get("kt")||0;
+  if(y1&&y2){S.kt=iX;$("#y1").value=cl(y1);$("#y2").value=cl(y2)}else S.kt=(kt>0&&kt<KHOANG.length&&kt!==iX)?kt:0;
+  veKt();$("#q").value=q;$("#pdf").checked=p.get("pdf")==="1";
+  S.tab=t>=0&&t<TABS.length?t:0;
+  chay();
+}
+async function shareLink(btn){
+  syncHash();const url=location.href,old=btn.innerHTML;
+  try{await navigator.clipboard.writeText(url);btn.innerHTML=ic("link")+"Đã chép link";setTimeout(()=>{if(btn.isConnected)btn.innerHTML=old},1800)}
+  catch(e){prompt("Sao chép link này:",url)}
+}
+
 /* ---------- Nguồn tải dần, phân trang 15 ---------- */
 function Src(fetchFn,raw=false){return{fetch:fetchFn,items:[],seen:new Set(),b:0,done:false,raw}}
 async function ensure(s,n){
@@ -421,7 +546,7 @@ function the(r,ct=false,fa=false){
   if(pdf)tags+=`<span class="tag ok">${ic("pdf")}PDF</span>`;
   if(r._cites)tags+=`<span class="tag">${Number(r._cites).toLocaleString("en-US")} trích dẫn</span>`;
   if(r._loai)tags+=`<span class="tag">${E(r._loai)}</span>`;
-  const det=ct?`<details><summary>Phương pháp, cỡ mẫu và kết quả chính</summary><p><b>Phương pháp, cỡ mẫu</b>${E(r["Phương pháp và cỡ mẫu"])}</p><p><b>Kết quả chính</b>${E(r["Kết quả chính"])}</p>${(S.apa||fa)?`<p><b>APA</b>${apa(r)}</p>`:""}</details>`:"";
+  const det=ct?`<details><summary>Phương pháp, cỡ mẫu và kết quả chính</summary><p><b>Phương pháp, cỡ mẫu</b>${E(r["Phương pháp và cỡ mẫu"])}</p><p><b>Kết quả chính</b>${E(r["Kết quả chính"])}</p>${(S.apa||fa)?`<p><b>${S.style}</b>${cite(r)}</p>`:""}</details>`:"";
   return`<article class="ent${pdf?" ok":""}"><div class="yr">${E(r._nam)||"–"}</div><div class="bd"><div class="ti">${E(r._tieu||"(không có tên)")}</div>`+
     (tg?`<p class="au">${E(tg)}</p>`:"")+(r._tc?`<p class="jr">${E(r._tc)}</p>`:"")+`<div class="tags">${tags}</div><div class="acts">${lk(pdf,"Tải PDF")}${lk(r["Link bài viết"],"Mở bài viết",!!pdf)}${svBtn(r)}</div>${det}</div></article>`;
 }
@@ -431,7 +556,7 @@ function bang(rows,rong="Không có kết quả.",luu=false){
   const head=cols.map(c=>`<th>${E(c)}</th>`).join("")+(luu?"<th>Kệ</th>":"");
   const body=rows.map(r=>"<tr>"+cols.map(c=>{const v=r[c],lb=E(c);
     if(c in LINK_NHAN)return`<td class="l" data-label="${lb}">${typeof v==="string"&&v.startsWith("http")?`<a href="${E(v)}" target="_blank" rel="noopener">${LINK_NHAN[c]}</a>`:""}</td>`;
-    if(c==="APA")return`<td class="w" data-label="${lb}">${v||""}</td>`;
+    if(STYLES.includes(c))return`<td class="w" data-label="${lb}">${v||""}</td>`;
     if(c==="STT"||c==="Trích dẫn"||c==="Năm"||typeof v==="number")return`<td class="n" data-label="${lb}">${E(v)}</td>`;
     return`<td data-label="${lb}"><div class="cl">${E(typeof v==="string"?v:"")}</div></td>`}).join("")+(luu?svCell(r):"")+"</tr>").join("");
   return`<div class="tw"><table class="tb"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
@@ -450,7 +575,7 @@ async function hienNguon(s,key,rong,kieu="the"){
   if(!rows.length)return msg(E(rong));
   return(kieu==="bang"?bang(rows):rows.map(r=>the(r)).join(""))+dieuHuong(key,p,rows.length,next);
 }
-const toApaRows=rows=>rows.map(r=>({...r,APA:apa(r)}));
+const toApaRows=rows=>rows.map(r=>({...r,[S.style]:cite(r)}));
 const plain=h=>{const d=document.createElement("div");d.innerHTML=h;return d.textContent};
 function csvText(rows){
   const cols=Object.keys(rows[0]||{}).filter(c=>!c.startsWith("_")),q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
@@ -465,9 +590,10 @@ function trangChu(){
   main.innerHTML=`<div class="welcome"><h1>Tra cứu <em>tài liệu</em> học thuật nhanh gọn</h1><p>Gộp OpenAlex và Crossref, ưu tiên bài uy tín, lọc riêng các bài có PDF mở được.</p></div>
   <div class="lbl">Gợi ý để bắt đầu</div><div class="chips">${VI_DU.map(chip).join("")}</div>
   ${rc.length?`<div class="lbl">Tìm gần đây</div><div class="chips">${rc.map(chip).join("")}</div>`:""}
-  <p class="tip"><b>Mẹo:</b> gõ từ khóa tiếng Anh để ra nhiều bài hơn. Bài nào ưng thì bấm “Lưu” để cất vào Kệ sách, rồi xuất danh mục APA một lần.</p>`;
+  <p class="tip"><b>Mẹo:</b> gõ từ khóa tiếng Anh để ra nhiều bài hơn. Bài nào ưng thì bấm “Lưu” để cất vào Kệ sách, rồi xuất danh mục trích dẫn (APA, Harvard, MLA, IEEE) một lần.</p>`;
 }
 async function render(){
+  syncHash();
   const kq=S.kq;if(!kq)return trangChu();
   const tok=++S.tok,tab=S.tab;let h="";
   const draw=x=>{if(tok===S.tok)main.innerHTML=x};
@@ -476,7 +602,7 @@ async function render(){
   draw(spin);
   await ensure(kq.bai,PAGE+1);if(tok!==S.tok)return;
   const rowsAll=kq.bai.items,nPdf=rowsAll.filter(r=>r["Link PDF"]).length;
-  let top=`<div class="strip"><span><b>${rowsAll.length.toLocaleString("en-US")}</b>bài đã tải</span><span><b>${nPdf}</b>có PDF mở được</span></div>`;
+  let top=`<div class="strip"><span><b>${rowsAll.length.toLocaleString("en-US")}</b>bài đã tải</span><span><b>${nPdf}</b>có PDF mở được</span><button class="btn" data-share="1" title="Sao chép link kết quả tìm kiếm này">${ic("link")}Chia sẻ</button></div>`;
   if(/[ăâđêôơưàáạảãằắặẳẵầấậẩẫèéẹẻẽềếệểễìíịỉĩòóọỏõồốộổỗờớợởỡùúụủũừứựửữỳýỵỷỹ]/i.test(S.q))top+=msg("Từ khóa tiếng Việt có thể ra ít bài, bạn thử gõ tiếng Anh xem.");
   draw(top+spin);
   if(tab===0){
@@ -486,8 +612,8 @@ async function render(){
       const pageShow=S.apa?toApaRows(rows):rows;
       h=`<div class="tools"><div class="seg">${["Bảng","Danh sách"].map(k=>`<button data-kieu="${k}" class="${S.kieu===k?"on":""}">${k}</button>`).join("")}</div>
         <div class="seg" title="Sắp xếp trong số bài đã tải">${Object.keys(CMP).map(k=>`<button data-sort="${k}" class="${S.sort===k?"on":""}">${k}</button>`).join("")}</div>
-        <label class="tg" title="Thêm cột trích dẫn APA vào bảng, danh sách và file CSV"><input type="checkbox" id="apa" ${S.apa?"checked":""}><i></i>APA</label>
-        <button class="btn" data-dl="csv">${ic("dl")}CSV</button>${S.apa?`<button class="btn" data-dl="apa">${ic("dl")}APA (Word)</button>`:""}</div>`+
+        <label class="tg" title="Thêm cột trích dẫn theo chuẩn đang chọn vào bảng, danh sách và file CSV"><input type="checkbox" id="apa" ${S.apa?"checked":""}><i></i>Trích dẫn</label>${styleSeg()}
+        <button class="btn" data-dl="csv">${ic("dl")}CSV</button><button class="btn" data-dl="apa">${ic("dl")}${S.style} (Word)</button><button class="btn" data-dl="bib">${ic("dl")}BibTeX</button><button class="btn" data-dl="ris">${ic("dl")}RIS</button></div>`+
         (S.kieu==="Danh sách"?pageShow.map(r=>the(r,true)).join(""):bang(pageShow,undefined,true)+'<div class="cap">Bấm vào ô văn bản dài để xem đầy đủ.</div>')+dieuHuong("bai",p,rows.length,next);
     }
   }else if(tab===1){
@@ -520,10 +646,10 @@ async function render(){
 
 function shelfHtml(){
   const L=S.shelf;
-  if(!L.length)return`<div class="empty">${ic("bm")}<h3>Kệ sách còn trống</h3><p>Bấm “Lưu” ở bất kỳ bài nào để gom về đây. Kệ được nhớ ngay trên máy bạn, lần sau mở lại vẫn còn.</p></div>`;
-  return`<div class="tools"><button class="btn" data-dl="scsv">${ic("dl")}CSV</button><button class="btn" data-dl="sapa">${ic("dl")}APA (Word)</button><button class="btn" data-clear="1">${ic("trash")}Xóa hết</button></div>`+L.map(r=>the(r,true,true)).join("");
+  if(!L.length)return`<div class="empty">${ic("bm")}<h3>Kệ sách còn trống</h3><p>Bấm “Lưu” ở bất kỳ bài nào để gom về đây. Kệ được nhớ ngay trên máy bạn, lần sau mở lại vẫn còn.</p><p><button class="btn" data-imp="1">${ic("up")}Nhập từ file sao lưu</button></p></div>`;
+  return`<div class="tools">${styleSeg()}<button class="btn" data-dl="scsv">${ic("dl")}CSV</button><button class="btn" data-dl="sapa">${ic("dl")}${S.style} (Word)</button><button class="btn" data-dl="sbib">${ic("dl")}BibTeX</button><button class="btn" data-dl="sris">${ic("dl")}RIS</button></div><div class="tools"><button class="btn" data-dl="sjson" title="Tải file sao lưu để chuyển sang máy khác">${ic("dl")}Sao lưu (JSON)</button><button class="btn" data-imp="1" title="Nhập lại file sao lưu JSON">${ic("up")}Nhập sao lưu</button><button class="btn" data-clear="1">${ic("trash")}Xóa hết</button></div>`+L.map(r=>the(r,true,true)).join("");
 }
-function shelfHome(){main.innerHTML=`<h2 class="sec">Kệ sách<small>${S.shelf.length} bài đã lưu</small></h2>`+shelfHtml()}
+function shelfHome(){syncHash();main.innerHTML=`<h2 class="sec">Kệ sách<small>${S.shelf.length} bài đã lưu</small></h2>`+shelfHtml()}
 function refresh(){if(S.kq)render();else if(S.tab===6)shelfHome();else trangChu()}
 
 /* ---------- Sự kiện ---------- */
@@ -544,7 +670,10 @@ $("#pdf").onchange=()=>{if(S.q)chay()};
 ["#y1","#y2"].forEach(s=>$(s).onchange=()=>{if(S.q)chay()});
 main.onclick=e=>{
   const cl=e.target.closest(".cl");if(cl&&!e.target.closest("a,button")){cl.classList.toggle("open");return}
-  const t=e.target.closest("[data-tab],[data-kieu],[data-nav],[data-vd],[data-dl],[data-save],[data-clear],[data-sort]");if(!t)return;const d=t.dataset;
+  const t=e.target.closest("[data-tab],[data-kieu],[data-nav],[data-vd],[data-dl],[data-save],[data-clear],[data-sort],[data-cs],[data-share],[data-imp]");if(!t)return;const d=t.dataset;
+  if(d.cs){if(STYLES.includes(d.cs)){S.style=d.cs;try{localStorage.setItem(STK,d.cs)}catch(e){}refresh()}return}
+  if(d.share){shareLink(t);return}
+  if(d.imp){$("#imp").click();return}
   if(d.save){const i=S.shelf.findIndex(x=>keyOf(x)===d.save);let on;
     if(i>=0){S.shelf.splice(i,1);on=false}else{const r=REG.get(d.save);if(!r)return;S.shelf.push(JSON.parse(JSON.stringify(r)));on=true}
     saveShelf();t.classList.toggle("on",on);t.innerHTML=ic(on?"bmf":"bm")+(on?"Đã lưu":"Lưu");updShelf();if(S.tab===6||(!S.kq&&!on))refresh();return}
@@ -554,19 +683,35 @@ main.onclick=e=>{
   else if(d.tab!=null){S.tab=+d.tab;render()}
   else if(d.kieu){S.kieu=d.kieu;render()}
   else if(d.nav){const[k,dx]=d.nav.split(":");S.pg[k]=Math.max(1,(S.pg[k]||1)+ +dx);render()}
-  else if(d.dl==="scsv"){download("ke_sach.csv",csvText(S.shelf.map(r=>({...r,APA:apa(r,false)}))),"text/csv")}
-  else if(d.dl==="sapa"){download("ke_sach_APA.html",apaDoc(S.shelf),"text/html")}
-  else if(d.dl==="csv"){const rows=S.kq.bai.items;download("danh_muc_tai_lieu.csv",csvText(S.apa?rows.map(r=>({...r,APA:apa(r,false)})):rows),"text/csv")}
-  else if(d.dl==="apa"){const ps=S.kq.bai.items.map(r=>apa(r)).sort((a,b)=>plain(a).localeCompare(plain(b))).map(x=>`<p style="margin-left:36pt;text-indent:-36pt">${x}</p>`).join("");
-    download("tai_lieu_tham_khao_APA.html",`<html><head><meta charset="utf-8"><title>Tài liệu tham khảo</title></head><body style="font-family:'Times New Roman',serif;font-size:12pt;line-height:2"><h3>Tài liệu tham khảo</h3>${ps}</body></html>`,"text/html")}
+  else if(d.dl==="scsv"){download("ke_sach.csv",csvText(S.shelf.map(r=>({...r,[S.style]:cite(r,false)}))),"text/csv")}
+  else if(d.dl==="sapa"){download("ke_sach_"+S.style+".html",refDoc(S.shelf),"text/html")}
+  else if(d.dl==="sbib"){download("ke_sach.bib",bibtex(S.shelf),"text/plain;charset=utf-8")}
+  else if(d.dl==="sris"){download("ke_sach.ris",ris(S.shelf),"application/x-research-info-systems")}
+  else if(d.dl==="sjson"){download("ke_sach_sao_luu.json",JSON.stringify({app:"singlib",version:1,exported:new Date().toISOString(),shelf:S.shelf},null,1),"application/json")}
+  else if(d.dl==="csv"){const rows=S.kq.bai.items;download("danh_muc_tai_lieu.csv",csvText(S.apa?rows.map(r=>({...r,[S.style]:cite(r,false)})):rows),"text/csv")}
+  else if(d.dl==="apa"){download("tai_lieu_tham_khao_"+S.style+".html",refDoc(S.kq.bai.items),"text/html")}
+  else if(d.dl==="bib"){download("danh_muc_tai_lieu.bib",bibtex(S.kq.bai.items),"text/plain;charset=utf-8")}
+  else if(d.dl==="ris"){download("danh_muc_tai_lieu.ris",ris(S.kq.bai.items),"application/x-research-info-systems")}
+};
+$("#imp").onchange=async e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  if(f.size>5e6)return alert("File quá lớn (tối đa 5 MB).");
+  try{
+    const d=JSON.parse(await f.text()),arr=Array.isArray(d)?d:(d&&Array.isArray(d.shelf)?d.shelf:null);
+    if(!arr)throw 0;let add=0;
+    for(const x of arr.slice(0,3000)){const r=cleanRow(x);if(r&&r._tieu&&!inShelf(r)){S.shelf.push(r);add++}}
+    saveShelf();updShelf();refresh();alert(`Đã nhập ${add} bài mới (bỏ qua ${arr.length-add} bài trùng hoặc không hợp lệ).`);
+  }catch(err){alert("File không đúng định dạng sao lưu của SngLib.")}
 };
 main.onchange=e=>{if(e.target.id==="apa"){S.apa=e.target.checked;render()}};
 $("#y2").value=NOW;S.shelf=loadShelf();veKt();updShelf();
 $("#shelfbtn").onclick=()=>{S.tab=6;if(S.kq)render();else{shelfHome();drawTabs()}scrollTo({top:0,behavior:"smooth"})};
 $("#tabs").onclick=e=>{const b=e.target.closest("[data-tab]");if(!b)return;const i=+b.dataset.tab;
   if(!S.kq&&i!==6){$("#q").focus();return}S.tab=i;if(S.kq)render();else{shelfHome();drawTabs()}scrollTo({top:0,behavior:"smooth"})};
+const H0=location.hash;
 drawTabs();
 trangChu();
+applyHash(H0);
 </script>
 <script src="config.js"></script>
 <script src="site.js" defer></script>
