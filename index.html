@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#050505">
 <title>SngLib · thư viện tra cứu</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%2338bdf8'/%3E%3Cg fill='none' stroke='%23101010' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='5.8' stroke-width='2.1'/%3E%3Cpath d='m15 15 5.2 5.2' stroke-width='2.4'/%3E%3Cpath d='M8.1 9.3h4.8M8.1 12h3' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,6 +47,7 @@ a{color:inherit}
 .shelfbtn{cursor:pointer;display:flex;align-items:center;gap:.5rem;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:.7rem 1rem;font-weight:700;font-size:.98rem;box-shadow:var(--sh);transition:.12s;white-space:nowrap}
 .shelfbtn:hover{border-color:var(--ring)}
 .shelfbtn .ic{margin:0}
+.impbtn{padding:.7rem;margin-left:.5rem}
 .shelfbtn b{background:var(--lime);color:#101010;border-radius:99px;min-width:1.5rem;padding:0 .45rem;text-align:center;font-size:.85rem}
 .filters{display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;align-items:center;margin:1rem 0 .2rem}
 .seg{display:inline-flex;gap:3px;background:var(--soft);padding:4px;border-radius:13px;max-width:100%}
@@ -123,7 +123,7 @@ a{color:inherit}
 .lkg a::after{content:"↗";font-weight:800;color:var(--ring)}
 .lkg a:hover{border-color:var(--ring);transform:translateY(-2px)}
 .empty{background:var(--panel);border:2px dashed var(--line);border-radius:18px;padding:2.4rem;text-align:center;margin:1.2rem 0}
-.empty .ic{width:2.6rem;height:2.6rem;margin:0 0 .6rem;color:var(--ring)}
+.empty>.ic{width:2.6rem;height:2.6rem;margin:0 0 .6rem;color:var(--ring)}
 .empty h3{font-size:1.4rem;font-weight:800;margin:0 0 .4rem}
 .empty p{margin:0;color:var(--mut)}
 /* trang chủ */
@@ -151,7 +151,7 @@ a{color:inherit}
 @media (max-width:768px){
   .top{flex-wrap:wrap}
   #f{flex:1 1 100%}
-  .shelfbtn{display:none}
+  .shelfbtn,.impbtn{display:none}
   #q{font-size:16px}
   .go{padding:.75rem 1.1rem}
   .strip span{padding:.55rem .9rem;font-size:.9rem}.strip b{font-size:1.5rem}
@@ -209,72 +209,6 @@ a{color:inherit}
 @media (max-width:768px){.cl{display:block;-webkit-line-clamp:unset;cursor:default}}
 .strip .btn{align-self:center}
 
-@media (min-width:1001px){.side{padding-top:40px}#tabs{margin-top:22px}}
-
-/* ===== tối ưu điện thoại ===== */
-@media (max-width:1000px){
-  html,body{overflow-x:clip}
-  .app{grid-template-columns:minmax(0,1fr)}
-  .col{min-width:0;width:100%;max-width:100%}
-}
-@media (max-width:768px){
-  .side{padding:12px 14px 6px;gap:8px 12px}
-  .brand{font-size:1.2rem;padding:0}
-  .logo{width:2.1rem;height:2.1rem;border-radius:11px}
-  #tabs{margin:0 -14px;padding:0 14px 8px;gap:6px}
-  #tabs button{padding:.55rem .9rem;font-size:.92rem;border-radius:99px;gap:.5rem}
-  #tabs .ic{width:1.1rem;height:1.1rem}
-  .col{padding:12px 14px 48px}
-  #f{border-radius:16px;padding:.2rem .2rem .2rem .85rem;gap:.4rem}
-  #q{padding:.7rem .2rem}
-  .go{padding:.75rem 1rem;min-height:44px}
-  .filters{gap:.7rem;margin:.8rem 0 .2rem}
-  .seg{display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-  .seg::-webkit-scrollbar{display:none}
-  .seg button{flex:none;min-height:40px}
-  .tools{gap:.6rem}
-  .tools .seg{flex:1 1 100%}
-  .years{flex-wrap:wrap}
-  .btn,.lk,.sv{min-height:44px}
-  .tb .sv{min-height:40px}
-  .ent .ti,.ent .au,.ent .jr,.tb td,.msg,.chip,.tip{overflow-wrap:anywhere}
-  .welcome h1{font-size:1.75rem}
-  .chip{max-width:100%}
-  .tip{font-size:.95rem}
-  .pg{gap:.5rem}
-  .pg .btn{flex:1 1 40%;justify-content:center}
-}
-
-/* ===== điện thoại: hiện đủ tab, bộ lọc năm không bị cắt ===== */
-@media (max-width:768px){
-  #tabs{flex-wrap:wrap;overflow:visible;margin:0;padding:0 0 10px;gap:6px}
-  #tabs button{padding:.45rem .8rem;font-size:.88rem;gap:.4rem}
-  #tabs .ic{display:none}
-  #tabs button{padding:.4rem .7rem}
-  #kt{flex-wrap:wrap;overflow:visible;width:100%}
-  #kt button{padding:.45rem .75rem;font-size:.9rem;min-height:38px}
-  .go .ic{display:none}
-  .go{padding:.75rem 1rem}
-  #f{gap:.3rem}
-}
-
-/* ===== điện thoại: thanh tab dưới đáy như ứng dụng ===== */
-.sh{display:none}
-@media (max-width:768px){
-  .side{padding:14px 16px 6px}
-  #tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0;padding:6px 2px calc(6px + env(safe-area-inset-bottom));gap:0;flex-direction:row;flex-wrap:nowrap;overflow:visible;
-    background:var(--side);border-top:1px solid rgba(255,255,255,.1)}
-  #tabs button{position:relative;flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:.35rem 0;border-radius:10px;font-size:.66rem;font-weight:600;line-height:1.15;text-align:center;white-space:normal;background:none}
-  #tabs button:hover{background:none}
-  #tabs button.on{background:none;color:var(--lime)}
-  #tabs .ic{display:block;width:1.4rem;height:1.4rem}
-  #tabs .full{display:none}
-  #tabs .sh{display:block;flex:none}
-  #tabs em{position:absolute;top:0;left:54%;margin:0;font-size:.6rem;padding:0 .35rem;background:var(--lime);color:#101010}
-  #kt{flex-wrap:nowrap;overflow-x:auto;padding:3px;gap:0}
-  #kt button{padding:.45rem .3rem;font-size:.76rem;flex:1 1 auto;white-space:nowrap}
-  .col{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
-}
 </style>
 </head>
 <body>
@@ -288,6 +222,7 @@ a{color:inherit}
     <div class="top">
       <form id="f"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg><input id="q" type="text" placeholder="Tìm bài báo, luận văn, sách..." autocomplete="off"><button class="go">Tìm<svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
       <button class="shelfbtn" id="shelfbtn" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg>Kệ sách<b id="shn">0</b></button>
+      <button class="shelfbtn impbtn" type="button" data-imp="1" title="Nhập từ file sao lưu" aria-label="Nhập từ file sao lưu"><svg class="ic" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></button>
     </div>
     <div class="filters">
       <div class="seg" id="kt"></div>
@@ -325,9 +260,8 @@ function rec(q){try{localStorage.setItem(RK,JSON.stringify([q,...recents().filte
 const inShelf=r=>S.shelf.some(x=>keyOf(x)===keyOf(r));
 const svBtn=r=>{REG.set(keyOf(r),r);const on=inShelf(r);return`<button class="sv${on?" on":""}" data-save="${E(keyOf(r))}">${ic(on?"bmf":"bm")}${on?"Đã lưu":"Lưu"}</button>`};
 const svCell=r=>`<td class="l" data-label="Kệ">${svBtn(r)}</td>`;
-const SHORT=["Bài báo","Liên quan","Tạp chí","Luận văn","Tác giả","Nơi khác","Kệ sách"];
 const TIC=["doc","rel","jr","thesis","users","globe","bm"];
-function drawTabs(){const a=S.kq||S.tab===6?S.tab:-1;$("#tabs").innerHTML=TABS.map((t,i)=>`<button data-tab="${i}" class="${i===a?"on":""}">${ic(TIC[i])}<span class="full">${t}</span><span class="sh">${SHORT[i]}</span>${i===6?`<em id="shc">${S.shelf.length}</em>`:""}</button>`).join("")}
+function drawTabs(){const a=S.kq||S.tab===6?S.tab:-1;$("#tabs").innerHTML=TABS.map((t,i)=>`<button data-tab="${i}" class="${i===a?"on":""}">${ic(TIC[i])}<span>${t}</span>${i===6?`<em id="shc">${S.shelf.length}</em>`:""}</button>`).join("")}
 function updShelf(){$("#shn").textContent=S.shelf.length;const c=$("#shc");if(c)c.textContent=S.shelf.length}
 
 /* ---------- Gọi API ---------- */
@@ -700,7 +634,7 @@ async function render(){
       h=`<div class="tools"><div class="seg">${["Bảng","Danh sách"].map(k=>`<button data-kieu="${k}" class="${S.kieu===k?"on":""}">${k}</button>`).join("")}</div>
         <div class="seg" title="Sắp xếp trong số bài đã tải">${Object.keys(CMP).map(k=>`<button data-sort="${k}" class="${S.sort===k?"on":""}">${k}</button>`).join("")}</div>
         <label class="tg" title="Thêm cột trích dẫn theo chuẩn APA vào bảng, danh sách và file CSV"><input type="checkbox" id="apa" ${S.apa?"checked":""}><i></i>Trích dẫn</label>${styleSeg()}
-        <button class="btn" data-dl="csv">${ic("dl")}CSV</button><button class="btn" data-dl="apa">${ic("dl")}${S.style} (Word)</button></div>`+
+        <button class="btn" data-dl="csv">${ic("dl")}CSV</button><button class="btn" data-dl="apa">${ic("dl")}${S.style} (Word)</button><button class="btn" data-dl="bib">${ic("dl")}BibTeX</button><button class="btn" data-dl="ris">${ic("dl")}RIS</button></div>`+
         (S.kieu==="Danh sách"?pageShow.map(r=>the(r,true)).join(""):bang(pageShow,undefined,true)+'<div class="cap">Bấm vào ô văn bản dài để xem đầy đủ.</div>')+dieuHuong("bai",p,rows.length,next);
     }
   }else if(tab===1){
@@ -733,8 +667,8 @@ async function render(){
 
 function shelfHtml(){
   const L=S.shelf;
-  if(!L.length)return`<div class="empty">${ic("bm")}<h3>Kệ sách còn trống</h3><p>Bấm “Lưu” ở bất kỳ bài nào để gom về đây. Kệ được nhớ ngay trên máy bạn, lần sau mở lại vẫn còn.</p><p><button class="btn" data-imp="1">${ic("up")}Nhập từ file sao lưu</button></p></div>`;
-  return`<div class="tools">${styleSeg()}<button class="btn" data-dl="scsv">${ic("dl")}CSV</button><button class="btn" data-dl="sapa">${ic("dl")}${S.style} (Word)</button></div><div class="tools"><button class="btn" data-dl="sjson" title="Tải file sao lưu để chuyển sang máy khác">${ic("dl")}Sao lưu (JSON)</button><button class="btn" data-imp="1" title="Nhập lại file sao lưu JSON">${ic("up")}Nhập sao lưu</button><button class="btn" data-clear="1">${ic("trash")}Xóa hết</button></div>`+L.map(r=>the(r,true,true)).join("");
+  if(!L.length)return`<div class="empty">${ic("bm")}<h3>Kệ sách còn trống</h3><p>Bấm “Lưu” ở bất kỳ bài nào để gom về đây. Kệ được nhớ ngay trên máy bạn, lần sau mở lại vẫn còn.</p><p><button class="btn" data-imp="1">Nhập từ file sao lưu</button></p></div>`;
+  return`<div class="tools">${styleSeg()}<button class="btn" data-dl="scsv">${ic("dl")}CSV</button><button class="btn" data-dl="sapa">${ic("dl")}${S.style} (Word)</button><button class="btn" data-dl="sbib">${ic("dl")}BibTeX</button><button class="btn" data-dl="sris">${ic("dl")}RIS</button></div><div class="tools"><button class="btn" data-dl="sjson" title="Tải file sao lưu để chuyển sang máy khác">${ic("dl")}Sao lưu (JSON)</button><button class="btn" data-imp="1" title="Nhập lại file sao lưu JSON">${ic("up")}Nhập sao lưu</button><button class="btn" data-clear="1">${ic("trash")}Xóa hết</button></div>`+L.map(r=>the(r,true,true)).join("");
 }
 function shelfHome(){syncHash();main.innerHTML=`<h2 class="sec">Kệ sách<small>${S.shelf.length} bài đã lưu</small></h2>`+shelfHtml()}
 function refresh(){if(S.kq)render();else if(S.tab===6)shelfHome();else trangChu()}
