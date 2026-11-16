@@ -6,7 +6,7 @@
 - Tra cứu qua API công khai: OpenAlex, Crossref (gọi trực tiếp từ trình duyệt).
 - Kệ sách lưu bằng `localStorage` trên máy người dùng.
 - Trích dẫn theo chuẩn **APA**.
-- Xuất danh mục ra CSV, file Word (HTML), **BibTeX** (`.bib`) và **RIS** (`.ris`) để dùng với Zotero, Mendeley, EndNote.
+- Xuất danh mục ra CSV và file Word (HTML).
 - **Chia sẻ link**: nút "Chia sẻ" sao chép địa chỉ chứa sẵn từ khóa, bộ lọc năm, lọc PDF và tab đang xem, mở link là ra đúng kết quả đó (dạng `#q=...&kt=2&pdf=1&t=0`).
 - **Sao lưu Kệ sách**: tải file JSON và nhập lại trên máy khác (chỉ nhập các trường dữ liệu an toàn, bỏ link nguy hiểm, tối đa 5 MB / 3000 bài).
 - Giao diện tự đổi sáng/tối theo hệ thống.
@@ -26,7 +26,7 @@ Repo đã có sẵn workflow `.github/workflows/pages.yml`. Chỉ cần:
 
 1. Push code lên nhánh `main`.
 2. Vào **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. Sau vài chục giây, trang chạy tại `https://<user>.github.io/<repo>/`.
+3. Sau vài chục giây, trang chạy tại `https://seangogroup-ops.github.io/SngLib/`.
 
 ## Cấu trúc
 
@@ -65,7 +65,7 @@ Dữ liệu lưu trên [Supabase](https://supabase.com) (miễn phí), trang v�
    select id from auth.users where email = 'ban@example.com';
    ```
 4. **Project Settings → API**: copy *Project URL* và *anon / publishable key* vào `config.js`.
-5. Commit, push. Vào `https://<user>.github.io/<repo>/admin/` để đăng nhập.
+5. Commit, push. Vào `https://seangogroup-ops.github.io/SngLib/admin/` để đăng nhập.
 
 ### Bảo mật & quyền riêng tư
 
