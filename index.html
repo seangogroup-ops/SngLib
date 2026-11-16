@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SngLib · thư viện tra cứu</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%23101010'/%3E%3Cg fill='%23facc15' stroke='%23facc15' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M10 6.5C6.5 7.5 4.5 10 4.5 13.5V18H10v-5.5H7.3c0-2 1-3.3 2.7-4z'/%3E%3Cpath d='M19.5 6.5C16 7.5 14 10 14 13.5V18h5.5v-5.5h-2.7c0-2 1-3.3 2.7-4z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:#f3f3f0;--panel:#fff;--ink:#101010;--mut:#585852;--line:#e0e0da;--soft:#eeeee9;--btn:#101010;--btnfg:#fff;--lime:#facc15;--ring:#a16207;--side:#0e0e0d;--sidefg:#f1f1ec;--sidemut:#a3a39a;--sh:0 1px 2px rgba(0,0,0,.05),0 8px 22px -12px rgba(0,0,0,.18)}
+@media (prefers-color-scheme:dark){:root{--bg:#0a0a09;--panel:#141413;--ink:#f3f3ee;--mut:#adada3;--line:#2b2b27;--soft:#1e1e1b;--btn:#facc15;--btnfg:#101010;--ring:#facc15;--side:#050505;--sh:0 1px 2px rgba(0,0,0,.5),0 8px 22px -12px rgba(0,0,0,.8)}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;overflow-x:hidden}
+button,input{font-family:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.ic{width:1.1em;height:1.1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.18em;margin-right:.45em;flex:none}
+.ic.f{fill:currentColor}.ic.r{margin:0 0 0 .45em}
+/* khung ứng dụng */
+.app{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;background:var(--side);color:var(--sidefg);padding:24px 14px;display:flex;flex-direction:column;gap:26px}
+.brand{display:flex;align-items:center;gap:.75rem;text-decoration:none;font-weight:800;font-size:1.35rem;letter-spacing:-.02em;padding:0 .5rem;color:#fff}
+.logo{width:2.4rem;height:2.4rem;border-radius:13px;background:var(--lime);color:#101010;display:grid;place-items:center;flex:none}
+.logo .ic{margin:0;width:1.4rem;height:1.4rem;stroke-width:2.2}
+#tabs{display:flex;flex-direction:column;gap:4px}
+#tabs button{display:flex;align-items:center;gap:.8rem;background:none;border:0;color:var(--sidemut);font-size:1rem;font-weight:600;padding:.75rem .9rem;border-radius:12px;cursor:pointer;text-align:left;transition:.12s;white-space:nowrap}
+#tabs button:hover{background:rgba(255,255,255,.08);color:#fff}
+#tabs button.on{background:var(--lime);color:#101010}
+#tabs .ic{margin:0;width:1.25rem;height:1.25rem}
+#tabs em{margin-left:auto;font-style:normal;font-size:.82rem;font-weight:700;background:rgba(255,255,255,.16);padding:.05rem .55rem;border-radius:99px}
+#tabs button.on em{background:rgba(0,0,0,.16)}
+.side-foot{margin-top:auto;font-size:.85rem;color:var(--sidemut);padding:0 .7rem}
+.col{min-width:0;padding:24px 36px 64px;max-width:1160px;width:100%}
+/* thanh tìm kiếm */
+.top{display:flex;gap:.8rem;align-items:center}
+#f{flex:1;min-width:0;display:flex;align-items:center;gap:.6rem;background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:.35rem .35rem .35rem 1.1rem;box-shadow:var(--sh);transition:.15s}
+#f:focus-within{border-color:var(--ring)}
+#f>.ic{margin:0;width:1.4rem;height:1.4rem;color:var(--mut)}
+#q{flex:1;min-width:0;border:0;background:transparent;outline:none;font-size:1.12rem;font-weight:500;padding:.7rem .3rem}
+#q::placeholder{color:var(--mut);opacity:1;font-weight:400}
+.go{cursor:pointer;border:0;background:var(--btn);color:var(--btnfg);font-size:1rem;font-weight:700;padding:.8rem 1.4rem;border-radius:13px;white-space:nowrap;transition:.12s}
+.go:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.go .ic{margin:0 0 0 .5em}
+.shelfbtn{cursor:pointer;display:flex;align-items:center;gap:.5rem;background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:.7rem 1rem;font-weight:700;font-size:.98rem;box-shadow:var(--sh);transition:.12s;white-space:nowrap}
+.shelfbtn:hover{border-color:var(--ring)}
+.shelfbtn .ic{margin:0}
+.shelfbtn b{background:var(--lime);color:#101010;border-radius:99px;min-width:1.5rem;padding:0 .45rem;text-align:center;font-size:.85rem}
+.filters{display:flex;flex-wrap:wrap;gap:.8rem 1.4rem;align-items:center;margin:1rem 0 .2rem}
+.seg{display:inline-flex;gap:3px;background:var(--soft);padding:4px;border-radius:13px;max-width:100%}
+.seg button{border:0;background:transparent;padding:.5rem .95rem;border-radius:10px;font-size:.95rem;font-weight:600;color:var(--mut);cursor:pointer;white-space:nowrap;transition:.12s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.tg{display:inline-flex;align-items:center;gap:.6rem;cursor:pointer;font-size:.98rem;font-weight:600;user-select:none}
+.tg input{display:none}
+.tg i{width:2.7rem;height:1.5rem;border-radius:99px;background:var(--line);position:relative;transition:.2s}
+.tg i::after{content:"";position:absolute;top:.2rem;left:.2rem;width:1.1rem;height:1.1rem;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.35);transition:.2s}
+.tg input:checked+i{background:var(--ring)}
+.tg input:checked+i::after{left:1.4rem}
+.years{display:flex;gap:.6rem;align-items:center;margin:.8rem 0;font-weight:600;font-size:.98rem}
+.years input{width:6rem;padding:.5rem .7rem;border-radius:11px;border:2px solid var(--line);background:var(--panel);outline:none;font-weight:600}
+.years input:focus{border-color:var(--ring)}
+/* nội dung */
+.strip{display:flex;flex-wrap:wrap;gap:.8rem;margin:1.2rem 0 .4rem}
+.strip span{display:flex;align-items:baseline;gap:.55rem;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:.7rem 1.2rem;font-size:.98rem;color:var(--mut);font-weight:500}
+.strip b{color:var(--ink);font-size:1.9rem;font-weight:800;line-height:1;letter-spacing:-.02em}
+.tools{display:flex;flex-wrap:wrap;gap:.8rem 1rem;align-items:center;margin:1.1rem 0}
+.btn{cursor:pointer;display:inline-flex;align-items:center;background:var(--panel);border:2px solid var(--line);color:var(--ink);padding:.55rem 1.05rem;border-radius:12px;font-size:.95rem;font-weight:700;white-space:nowrap;transition:.12s}
+.btn:hover:not(:disabled){border-color:var(--ring);transform:translateY(-1px)}
+.btn:disabled{opacity:.35;cursor:default}
+.btn .ic{margin-right:.4em}.btn .ic.r{margin:0 0 0 .4em}
+.msg{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--ring);border-radius:12px;padding:.9rem 1.1rem;margin:.9rem 0;font-size:1rem}
+.msg.w{border-left-color:#f59e0b}
+.cap{font-size:.95rem;color:var(--mut);margin:.4rem 0}
+.spin{display:flex;align-items:center;gap:.8rem;padding:1.2rem 0;font-weight:600;color:var(--mut)}
+.spin::before{content:"";width:1.3rem;height:1.3rem;border-radius:50%;border:3px solid var(--line);border-top-color:var(--ring);animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.sec{font-size:1.5rem;font-weight:800;letter-spacing:-.02em;margin:2rem 0 .8rem;display:flex;gap:.8rem;align-items:baseline;flex-wrap:wrap}
+.sec small{font-size:.95rem;color:var(--mut);font-weight:500;letter-spacing:0}
+.ent{display:grid;grid-template-columns:4.6rem 1fr;gap:0 1.2rem;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:1.3rem 1.4rem;margin:.85rem 0;box-shadow:var(--sh);transition:.15s;animation:up .35s both}
+.ent:hover{border-color:var(--ring)}
+.ent .yr{align-self:start;text-align:center;font-weight:800;font-size:1.05rem;background:var(--soft);border-radius:11px;padding:.4rem 0;font-variant-numeric:tabular-nums}
+.ent.ok .yr{background:var(--lime);color:#101010}
+.ent .ti{font-size:1.3rem;font-weight:800;line-height:1.3;letter-spacing:-.015em;margin-bottom:.35rem}
+.ent .au{font-size:1.02rem;margin:0;font-weight:500}
+.ent .jr{font-size:1rem;color:var(--mut);margin:.1rem 0 0}
+.tags{margin:.8rem 0 0;display:flex;flex-wrap:wrap;gap:.4rem}
+.tag{display:inline-flex;align-items:center;font-size:.85rem;font-weight:700;padding:.2rem .7rem;border-radius:99px;background:var(--soft);color:var(--ink)}
+.tag .ic{width:.95em;height:.95em;margin-right:.3em}
+.tag.ok{background:var(--lime);color:#101010}
+.acts{margin:.95rem 0 0;display:flex;flex-wrap:wrap;gap:.5rem}
+.lk,.sv{cursor:pointer;display:inline-flex;align-items:center;font-size:.95rem;font-weight:700;padding:.55rem 1.05rem;border-radius:12px;text-decoration:none;border:2px solid var(--btn);background:var(--btn);color:var(--btnfg);transition:.12s}
+.lk:hover{filter:brightness(1.18);transform:translateY(-1px)}
+.lk.s{background:transparent;color:var(--ink);border-color:var(--line)}
+.lk.s:hover{border-color:var(--ring);filter:none}
+.sv{background:transparent;color:var(--ink);border-color:var(--line)}
+.sv:hover{border-color:var(--ring)}
+.sv.on{background:var(--lime);border-color:var(--lime);color:#101010}
+.lk .ic,.sv .ic{margin-right:.4em}
+.ent details{margin-top:.9rem;background:var(--soft);border-radius:13px;padding:.7rem 1rem;font-size:1rem}
+.ent summary{cursor:pointer;font-weight:700}
+.ent details p{margin:.6rem 0 0}
+.ent details b{display:block;font-size:.88rem;font-weight:800;color:var(--mut);margin-bottom:.1rem}
+.tw{overflow-x:auto;margin:.8rem 0 1.2rem;background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh)}
+.tb{width:100%;border-collapse:collapse;font-size:.97rem;line-height:1.55}
+.tb th,.tb td{padding:12px 15px;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;text-align:left;border-bottom:1px solid var(--line)}
+.tb tr:last-child td{border-bottom:0}
+.tb th{font-weight:800;font-size:.88rem;white-space:nowrap;background:var(--soft);color:var(--mut)}
+.tb tbody tr:hover td{background:var(--soft)}
+.tb td{min-width:90px}.tb td.w{min-width:320px}
+.tb td.n{white-space:nowrap;text-align:right;width:1%;font-variant-numeric:tabular-nums;font-weight:700}
+.tb td.l{white-space:nowrap;width:1%}
+.tb a{font-weight:700;text-decoration:underline;text-decoration-color:var(--ring);text-underline-offset:3px}
+.tb .sv{padding:.3rem .7rem;font-size:.85rem}
+.pg{display:flex;gap:.7rem;align-items:center;margin:1.2rem 0;flex-wrap:wrap}
+.pg .cap{margin:0}
+.lkg{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem}
+.lkg a{display:flex;justify-content:space-between;align-items:center;gap:.6rem;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:.95rem 1.05rem;text-decoration:none;font-weight:700;font-size:1rem;box-shadow:var(--sh);transition:.12s}
+.lkg a::after{content:"↗";font-weight:800;color:var(--ring)}
+.lkg a:hover{border-color:var(--ring);transform:translateY(-2px)}
+.empty{background:var(--panel);border:2px dashed var(--line);border-radius:18px;padding:2.4rem;text-align:center;margin:1.2rem 0}
+.empty .ic{width:2.6rem;height:2.6rem;margin:0 0 .6rem;color:var(--ring)}
+.empty h3{font-size:1.4rem;font-weight:800;margin:0 0 .4rem}
+.empty p{margin:0;color:var(--mut)}
+/* trang chủ */
+.welcome{background:var(--side);color:#fff;border-radius:24px;padding:2.4rem 2.2rem;margin:1.4rem 0 .6rem;position:relative;overflow:hidden}
+.welcome::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;background:var(--lime);opacity:.9}
+.welcome h1{font-size:clamp(1.9rem,4vw,2.9rem);line-height:1.1;font-weight:800;letter-spacing:-.03em;margin:0 0 .7rem;max-width:14em;position:relative;z-index:1}
+.welcome h1 em{font-style:normal;background:var(--lime);color:#101010;padding:0 .25em;border-radius:.2em}
+.welcome p{margin:0;max-width:34em;color:#c9c9c0;font-size:1.05rem;position:relative;z-index:1}
+.lbl{font-size:1.05rem;font-weight:800;margin:1.8rem 0 .7rem}
+.chips{display:flex;flex-wrap:wrap;gap:.6rem}
+.chip{cursor:pointer;background:var(--panel);border:2px solid var(--line);border-radius:99px;padding:.6rem 1.1rem;font-size:1rem;font-weight:600;transition:.12s;text-align:left}
+.chip:hover{background:var(--lime);border-color:var(--lime);color:#101010;transform:translateY(-2px)}
+.tip{margin-top:1.6rem;color:var(--mut);font-size:1rem;max-width:44em}
+.tip b{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:1000px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 14px 10px;gap:10px 16px}
+  .side-foot{display:none}
+  #tabs{flex-direction:row;overflow-x:auto;scrollbar-width:none;flex:1 1 100%;order:3;gap:6px}
+  #tabs::-webkit-scrollbar{display:none}
+  #tabs button{padding:.6rem .95rem;font-size:.95rem;flex:none}
+  .col{padding:16px 14px 56px}
+}
+@media (max-width:768px){
+  .top{flex-wrap:wrap}
+  #f{flex:1 1 100%}
+  .shelfbtn{display:none}
+  #q{font-size:16px}
+  .go{padding:.75rem 1.1rem}
+  .strip span{padding:.55rem .9rem;font-size:.9rem}.strip b{font-size:1.5rem}
+  .welcome{padding:1.8rem 1.4rem;border-radius:20px}
+  .welcome::after{width:150px;height:150px;right:-50px;top:-50px}
+  .sec{font-size:1.3rem}
+  .ent{grid-template-columns:1fr;padding:1.1rem}
+  .ent .yr{width:4rem;margin-bottom:.6rem}
+  .ent .ti{font-size:1.15rem}
+  .acts .lk,.acts .sv{flex:1 1 38%;justify-content:center}
+  .tw{overflow:visible;background:none;border:0;box-shadow:none}
+  .tb,.tb tbody,.tb tr,.tb td{display:block;width:100%}
+  .tb thead{display:none}
+  .tb tr{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:.4rem 1rem;margin:0 0 .8rem;box-shadow:var(--sh)}
+  .tb td,.tb td.n,.tb td.l,.tb td.w{display:flex;gap:.8rem;justify-content:space-between;align-items:baseline;width:100%;min-width:0;text-align:right;white-space:normal;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .tb tbody tr:hover td{background:none}
+  .tb td:last-child{border-bottom:0}
+  .tb td::before{content:attr(data-label);flex:0 0 36%;max-width:36%;text-align:left;font-size:.82rem;font-weight:700;color:var(--mut)}
+  .tb td:empty{display:none}
+  .tb td.w{display:block;text-align:left}
+  .tb td.w::before{display:block;max-width:none;margin-bottom:.2rem}
+  .lkg{grid-template-columns:1fr 1fr}
+  .pg .cap{flex:1 1 100%}
+}
+@media (max-width:380px){.acts .lk,.acts .sv{flex:1 1 100%}.tb td::before{flex-basis:42%;max-width:42%}}
+
+/* ===== bản sửa lỗi hiển thị ===== */
+[hidden]{display:none!important}
+.ent{max-width:none}
+.tw{max-width:100%}
+.tb{font-size:.92rem}
+.cl{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.cl.open{display:block;-webkit-line-clamp:unset}
+.side{border-right:1px solid rgba(255,255,255,.08)}
+.welcome{background:var(--lime);color:#101010}
+.welcome::after{background:rgba(16,16,16,.07);opacity:1;width:340px;height:340px;right:-100px;top:auto;bottom:-170px}
+.welcome h1 em{background:#101010;color:var(--lime)}
+.welcome p{color:#3b3004}
+@media (min-width:1001px){
+  .app{grid-template-columns:clamp(240px,17vw,280px) 1fr}
+  .col{max-width:none;padding:24px clamp(14px,2.4vw,44px) 64px}
+  #tabs button{white-space:normal;line-height:1.3}
+  #tabs button span{flex:1;min-width:0}
+  .side-foot{white-space:normal}
+}
+@media (min-width:769px){
+  .tb th,.tb td{padding:11px 12px}
+  .tb td{min-width:130px}
+  .tb td.n{min-width:0}
+  .tb td.l{min-width:0;padding-left:6px;padding-right:6px}
+  .tb td:first-child,.tb th:first-child{padding-left:16px}
+  .tb td:last-child,.tb th:last-child{padding-right:16px}
+}
+@media (max-width:1000px){.col{max-width:none}}
+@media (max-width:768px){.cl{display:block;-webkit-line-clamp:unset;cursor:default}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <a class="brand" href="./"><span class="logo"><svg class="ic f" viewBox="0 0 24 24"><g stroke-width="1.4"><path d="M10 6.5C6.5 7.5 4.5 10 4.5 13.5V18H10v-5.5H7.3c0-2 1-3.3 2.7-4z"/><path d="M19.5 6.5C16 7.5 14 10 14 13.5V18h5.5v-5.5h-2.7c0-2 1-3.3 2.7-4z"/></g></svg></span>SngLib</a>
+    <nav id="tabs"></nav>
+    <div class="side-foot">Dữ liệu từ OpenAlex và Crossref</div>
+  </aside>
+  <div class="col">
+    <div class="top">
+      <form id="f"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg><input id="q" type="text" placeholder="Tìm bài báo, luận văn, sách..." autocomplete="off"><button class="go">Tìm<svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+      <button class="shelfbtn" id="shelfbtn" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg>Kệ sách<b id="shn">0</b></button>
+    </div>
+    <div class="filters">
+      <div class="seg" id="kt"></div>
+      <label class="tg" title="Chỉ giữ các bài có link PDF mở được trực tiếp"><input type="checkbox" id="pdf"><i></i>Chỉ bài có PDF</label>
+    </div>
+    <div class="years" id="yrs" hidden>Từ năm <input type="number" id="y1" value="2018" min="1900"> đến năm <input type="number" id="y2" min="1900"></div>
+    <main id="main"></main>
+  </div>
+</div>
+<script>
+const OA="https://api.openalex.org/",CR="https://api.crossref.org/works";
+const MAIL="you@example.com";   // đổi thành email thật để OpenAlex/Crossref ưu tiên request của bạn
+const MISSING="Không nêu rõ trong tài liệu",PAGE=15,BATCH=50,NOW=new Date().getFullYear();
+const KHOANG=[["Tất cả",0],["3 năm qua",3],["5 năm qua",5],["10 năm qua",10],["Tùy chọn","x"]];
+const TABS=["Bài báo","Bài liên quan","Tạp chí","Luận văn, sách, báo cáo","Tác giả và chủ đề","Tìm ở nơi khác","Kệ sách"];
+const VI_DU=["academic stress university students","online learning engagement","sleep quality adolescents"];
+const LOAI_TL=[["Luận văn, luận án","dissertation",["dissertation"]],["Sách và chương sách","book|book-chapter",["book","monograph","edited-book","book-chapter"]],["Báo cáo","report",["report"]]];
+const LINK_NHAN={"Link PDF":"PDF","Link bài viết":"Mở bài","Trang chủ tạp chí":"Mở trang","Trang OpenAlex":"Mở","Trang tác giả":"Mở hồ sơ","Tra cứu tạp chí":"Mở","Tra cứu tác giả":"Mở"};
+const IC={doc:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>',rel:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',jr:'<path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/>',thesis:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-4.5"/>',users:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.3c1.8.8 3 2.7 3 5.7"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/>',dl:'<path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/>',bm:'<path d="M6 4h12v16l-6-4-6 4z"/>',ext:'<path d="M8 16L17 7M9 7h8v8"/>',pdf:'<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/>',l:'<path d="M15 6l-6 6 6 6"/>',r:'<path d="M9 6l6 6-6 6"/>',trash:'<path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/>'};
+const ic=(n,c="")=>`<svg class="ic${n==="bmf"?" f":""}${c?" "+c:""}" viewBox="0 0 24 24">${IC[n==="bmf"?"bm":n]}</svg>`;
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const E=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm=s=>(s||"").toLowerCase().replace(/\W+/g,"");
+let S={q:"",y1:1990,y2:NOW,pdf:false,kt:0,tab:0,kieu:"Bảng",apa:false,kq:null,pg:{},tok:0,dp:new Set(),sort:"Liên quan",shelf:[]};
+const SK="singlib_shelf_v1",RK="singlib_recent_v1",REG=new Map();
+const CMP={"Liên quan":null,"Trích dẫn":(a,b)=>(b._cites||0)-(a._cites||0),"Mới nhất":(a,b)=>(+b._nam||0)-(+a._nam||0)};
+const keyOf=r=>r._doi||norm(r._tieu);
+function loadShelf(){try{return JSON.parse(localStorage.getItem(SK)||"[]")}catch(e){return[]}}
+function saveShelf(){try{localStorage.setItem(SK,JSON.stringify(S.shelf))}catch(e){}}
+function recents(){try{return JSON.parse(localStorage.getItem(RK)||"[]")}catch(e){return[]}}
+function rec(q){try{localStorage.setItem(RK,JSON.stringify([q,...recents().filter(x=>x!==q)].slice(0,6)))}catch(e){}}
+const inShelf=r=>S.shelf.some(x=>keyOf(x)===keyOf(r));
+const svBtn=r=>{REG.set(keyOf(r),r);const on=inShelf(r);return`<button class="sv${on?" on":""}" data-save="${E(keyOf(r))}">${ic(on?"bmf":"bm")}${on?"Đã lưu":"Lưu"}</button>`};
+const svCell=r=>`<td class="l" data-label="Kệ">${svBtn(r)}</td>`;
+const TIC=["doc","rel","jr","thesis","users","globe","bm"];
+function drawTabs(){const a=S.kq||S.tab===6?S.tab:-1;$("#tabs").innerHTML=TABS.map((t,i)=>`<button data-tab="${i}" class="${i===a?"on":""}">${ic(TIC[i])}<span>${t}</span>${i===6?`<em id="shc">${S.shelf.length}</em>`:""}</button>`).join("")}
+function updShelf(){$("#shn").textContent=S.shelf.length;const c=$("#shc");if(c)c.textContent=S.shelf.length}
+const apaDoc=rows=>`<html><head><meta charset="utf-8"><title>Tài liệu tham khảo</title></head><body style="font-family:'Times New Roman',serif;font-size:12pt;line-height:2"><h3>Tài liệu tham khảo</h3>${rows.map(r=>apa(r)).sort((a,b)=>plain(a).localeCompare(plain(b))).map(x=>`<p style="margin-left:36pt;text-indent:-36pt">${x}</p>`).join("")}</body></html>`;
+
+/* ---------- Gọi API ---------- */
+const cache=new Map();let oaPause=0;const oaLoi=new Set();
+async function jget(url,isOA){
+  if(cache.has(url))return cache.get(url);
+  if(isOA&&Date.now()<oaPause){oaLoi.add(429);return null}
+  for(let i=0;i<3;i++){
+    try{
+      const r=await fetch(url);
+      if(r.ok){const d=await r.json();cache.set(url,d);return d}
+      if(isOA)oaLoi.add(r.status);
+      if(r.status===429){if(isOA)oaPause=Date.now()+60000;return null}
+      if(r.status>=500){await sleep(1000*(i+1));continue}
+      return null;
+    }catch(e){if(isOA)oaLoi.add(0);await sleep(800*(i+1))}
+  }
+  return null;
+}
+const oa=(p,o)=>jget(OA+p+"?"+new URLSearchParams({...o,mailto:MAIL}),true);
+const lastId=k=>String(k).split("/").pop();
+
+/* ---------- Chuẩn hóa dữ liệu ---------- */
+const abstractOf=idx=>{if(!idx)return"";const p=[];for(const[w,ps]of Object.entries(idx))ps.forEach(i=>p[i]=w);return p.filter(Boolean).join(" ")};
+const tachTen=n=>{const a=(n||"").trim().split(/\s+/);return a.length>1?[a.pop(),a.join(" ")]:[n||"",""]};
+function fromOA(w){
+  const locs=[w.best_oa_location||{},...(w.locations||[])];
+  const src=(w.primary_location||{}).source||{};
+  const ten=(w.authorships||[]).map(a=>a.author.display_name);
+  const tg=ten.length?ten.slice(0,3).join(", ")+(ten.length>3?" và cộng sự":""):MISSING;
+  return{pdf:(locs.find(l=>l&&l.pdf_url)||{}).pdf_url||"",trang:w.doi||(locs.find(l=>l&&l.landing_page_url)||{}).landing_page_url||w.id||"",
+    tg,nam:w.publication_year||"",tieu:w.title||"",tc:src.display_name||"",abstract:abstractOf(w.abstract_inverted_index),
+    doi:(w.doi||"").toLowerCase(),cites:w.cited_by_count||0,loai:w.type||"",related:w.related_works||[],ds:ten.map(tachTen),nl:src.type||""};
+}
+function fromCR(it){
+  const tieu=(it.title||[""])[0];if(!tieu)return null;
+  const au=(it.author||[]).map(a=>`${a.given||""} ${a.family||""}`.trim());
+  let nam="";try{nam=it.issued["date-parts"][0][0]||""}catch(e){}
+  return{pdf:((it.link||[]).find(l=>(l["content-type"]||"").includes("pdf"))||{}).URL||"",trang:it.URL||"",
+    tg:au.length?au.slice(0,3).join(", ")+(au.length>3?" và cộng sự":""):MISSING,nam,tieu,tc:(it["container-title"]||[""])[0],
+    abstract:(it.abstract||"").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim(),doi:it.DOI?("https://doi.org/"+it.DOI).toLowerCase():"",
+    cites:it["is-referenced-by-count"]||0,loai:it.type||"",related:[],ds:(it.author||[]).map(a=>[a.family||a.name||"",a.given||""]),nl:it.type==="journal-article"?"journal":""};
+}
+const diem=c=>{let d=0;if(["article","journal-article","review"].includes(c.loai)&&["journal",""].includes(c.nl))d+=2;
+  if(["repository","ebook platform"].includes(c.nl))d-=1;if(["preprint","posted-content"].includes(c.loai))d-=3;if(c.doi)d+=1;return d+Math.log1p(c.cites||0)};
+const xep=l=>[...l].sort((a,b)=>diem(b)-diem(a));
+function gop(...ls){const seen=new Set(),out=[],n=Math.max(0,...ls.map(l=>l.length));
+  for(let i=0;i<n;i++)for(const l of ls){const c=l[i];if(!c)continue;const k=c.doi||norm(c.tieu);if(k&&!seen.has(k)){seen.add(k);out.push(c)}}return out}
+
+async function timOA(q,y1,y2,{oaOnly=false,extra="",sort="",per=BATCH,page=1}={}){
+  const f=`publication_year:${y1}-${y2}`+(oaOnly?",open_access.is_oa:true":"")+(extra?","+extra:"");
+  const p={search:q,filter:f,"per-page":per,page};if(sort)p.sort=sort;
+  const d=await oa("works",p);return d?(d.results||[]).map(fromOA):[];
+}
+async function timCR(q,y1,y2,{types=[],offset=0,rows=BATCH,sort=""}={}){
+  const p={"query.bibliographic":q,rows,offset,filter:`from-pub-date:${y1},until-pub-date:${y2}`+types.map(t=>",type:"+t).join(""),
+    select:"DOI,title,author,issued,container-title,abstract,link,URL,is-referenced-by-count,type",mailto:MAIL};
+  if(sort){p.sort=sort;p.order="desc"}
+  const d=await jget(CR+"?"+new URLSearchParams(p));return d?((d.message||{}).items||[]).map(fromCR).filter(Boolean):[];
+}
+
+/* ---------- Trích xuất bằng quy tắc ---------- */
+const DESIGN=/cross-sectional|longitudinal|randomi[sz]ed|quasi-experiment|experiment|systematic review|meta-analysis|qualitative|quantitative|mixed[- ]methods?|case study|cohort|survey|interview|focus group|structural equation|regression|cắt ngang|nghiên cứu dọc|thực nghiệm|định tính|định lượng|hỗn hợp|khảo sát|phỏng vấn|hồi quy/i;
+const INSTR=/\bscales?\b|questionnaire|inventory|instrument|measured (?:by|using|with)|assessed (?:by|using|with)|Cronbach|checklist|thang đo|bộ câu hỏi|bảng hỏi|công cụ đo/i;
+const RESULT=/results? (?:show|indicate|reveal|suggest)|found that|we found|significant|associated|correlat|prevalence|predict|\d+(?:[.,]\d+)?\s?%|kết quả|liên quan|tương quan|tỷ lệ|có ý nghĩa/i;
+const SAMPLE=/\b[nN]\s*=\s*[\d.,]+|\b\d[\d.,]*\s+(?:\w+\s+){0,2}(?:students|participants|respondents|adults|sinh viên|người)/i;
+const SCALE=/\b(?:[A-Z][\w\-]*\s){1,5}(?:Scale|Questionnaire|Inventory|Index|Survey|Checklist|Test)\b(?:\s\([A-Z][\w\-]*\))?/g;
+function trich(text){
+  text=text.replace(/\s+/g," ");
+  const cau=text.split(/(?<=[.!?])\s+(?=[A-ZÀ-Ỹ0-9])/).map(s=>s.trim()).filter(s=>s.length>40&&s.length<400),dung=new Set();
+  const lay=(re,n)=>{const o=cau.filter(x=>re.test(x)&&!dung.has(x)).slice(0,n);o.forEach(x=>dung.add(x));return o};
+  const m=text.match(SAMPLE),mau=m?m[0].trim():"";
+  const ten=[...new Set((text.match(SCALE)||[]).map(x=>x.replace(/^(?:The|A|An)\s+/,"")))].slice(0,3);
+  const cc=ten.length?[]:lay(INSTR,2);
+  return{mau:mau||MISSING,tk:lay(DESIGN,2).join(" ")||MISSING,cu:(ten.length?ten.join("; "):cc.join(" "))||MISSING,kq:lay(RESULT,3).join(" ")||MISSING};
+}
+function dong(c,stt,tx=true){
+  const t=tx&&c.abstract?trich(c.abstract):{mau:MISSING,tk:MISSING,cu:MISSING,kq:MISSING},pp=[];
+  if(t.mau!==MISSING)pp.push(`[Cỡ mẫu: ${t.mau}]`);if(t.tk!==MISSING)pp.push(t.tk);if(t.cu!==MISSING)pp.push(`[Công cụ: ${t.cu}]`);
+  return{"STT":stt,"Tác giả, năm":`${c.tg||MISSING}, ${c.nam||MISSING}`,"Tên bài, tạp chí":`${c.tieu||MISSING}; ${c.tc}`.replace(/; $/,""),
+    "Phương pháp và cỡ mẫu":pp.join(" ")||MISSING,"Kết quả chính":t.kq,"Link PDF":c.pdf||null,"Link bài viết":c.trang||null,
+    _tieu:c.tieu,_tc:c.tc,_cites:c.cites,_ds:c.ds||[],_nam:c.nam,_doi:(c.doi||"").replace(/^https?:\/\/(?:dx\.)?doi\.org\//i,""),_loai:c.loai};
+}
+
+/* ---------- APA ---------- */
+const vietTat=g=>(g||"").replace(/\./g," ").split(/\s+/).filter(Boolean).map(t=>t.split("-").filter(Boolean).map(p=>p[0].toUpperCase()+".").join("-")).join(" ");
+const tenApa=([f,g])=>{const v=vietTat(g);return v?`${f}, ${v}`:f};
+function dsApa(ds){const n=ds.filter(Boolean).map(tenApa).filter(Boolean);if(!n.length)return"";if(n.length===1)return n[0];
+  return n.length<=20?n.slice(0,-1).join(", ")+", & "+n.at(-1):n.slice(0,19).join(", ")+", ... "+n.at(-1)}
+function apa(r,html=true){
+  const e=html?E:(x=>x),tg=dsApa(r._ds),nam=r._nam?String(r._nam):"n.d.",tieu=(r._tieu||"").trim().replace(/\.$/,""),tc=(r._tc||"").trim();
+  const link=r._doi?"https://doi.org/"+r._doi:(r["Link bài viết"]||r["Link PDF"]||"");
+  let o=tg?`${e(tg.endsWith(".")?tg:tg+".")} (${nam}). ${e(tieu)}.`:`${e(tieu)}. (${nam}).`;
+  if(tc)o+=html?` <i>${E(tc)}</i>.`:` ${tc}.`;
+  if(link)o+=html?` <a href="${E(link)}" target="_blank" rel="noopener">${E(link)}</a>`:" "+link;
+  return o;
+}
+
+/* ---------- Nguồn tải dần, phân trang 15 ---------- */
+function Src(fetchFn,raw=false){return{fetch:fetchFn,items:[],seen:new Set(),b:0,done:false,raw}}
+async function ensure(s,n){
+  while(s.items.length<n&&!s.done&&s.b<15){
+    s.b++;const c=await s.fetch(s.b);
+    if(!c.length){s.done=true;break}
+    for(const r of c){
+      if(!s.raw){if(S.pdf&&!r["Link PDF"])continue;const k=r._doi||norm(r._tieu);if(s.seen.has(k))continue;s.seen.add(k)}
+      s.items.push(r);
+    }
+  }
+}
+const papers=(fn,tx=true)=>Src(async b=>{const l=await fn(b);return l.map((c,i)=>dong(c,(b-1)*BATCH+i+1,tx))});
+function buildKq(){
+  const {q,y1,y2,pdf}=S;
+  S.kq={
+    bai:papers(async b=>{const[a,c]=await Promise.all([timOA(q,y1,y2,{oaOnly:pdf,page:b}),timCR(q,y1,y2,{offset:(b-1)*BATCH})]);return xep(gop(a,c))}),
+    cite:papers(async b=>{const a=await timOA(q,y1,y2,{sort:"cited_by_count:desc",page:b});return a.length?a:timCR(q,y1,y2,{offset:(b-1)*BATCH,sort:"is-referenced-by-count"})},false),
+    lq:papers(async b=>{if(b>1)return[];const a=await timOA(q,y1,y2,{oaOnly:pdf});
+      const ids=[...new Set(a.filter(c=>c.related.length).slice(0,3).flatMap(c=>c.related.slice(0,8).map(lastId)))].slice(0,25);
+      if(!ids.length)return[];const d=await oa("works",{filter:"openalex:"+ids.join("|"),"per-page":25});return d?(d.results||[]).map(fromOA):[]},false),
+    lv:LOAI_TL.map(([,o,cr])=>papers(async b=>{const[a,c]=await Promise.all([timOA(q,1990,y2,{extra:"type:"+o,page:b}),timCR(q,1990,y2,{types:cr,offset:(b-1)*BATCH})]);return xep(gop(a,c))},false)),
+    tcs:Src(async b=>b>1?[]:groupTC(),true),tgs:Src(async b=>b>1?[]:groupTG(),true),cds:Src(async b=>b>1?[]:groupCD(),true)
+  };
+}
+async function groups(field,extra=""){
+  const d=await oa("works",{search:S.q,filter:`publication_year:${S.y1}-${S.y2}`+(extra?","+extra:""),group_by:field});
+  return d?(d.group_by||[]).filter(g=>g.key&&g.key!=="unknown").slice(0,50):null;
+}
+async function enrich(path,gs){
+  const d=await oa(path,{filter:"openalex:"+gs.map(g=>lastId(g.key)).join("|"),"per-page":50});
+  return Object.fromEntries(((d&&d.results)||[]).map(x=>[x.id,x]));
+}
+async function crTongHop(){
+  const ds=[...await timCR(S.q,S.y1,S.y2,{rows:100}),...await timCR(S.q,S.y1,S.y2,{rows:100,offset:100})];
+  const cnt=a=>Object.entries(a.reduce((m,x)=>(m[x]=(m[x]||0)+1,m),{})).sort((a,b)=>b[1]-a[1]).slice(0,50);
+  return[cnt(ds.map(c=>c.tc).filter(Boolean)),cnt(ds.flatMap(c=>c.ds.map(([f,g])=>`${g} ${f}`.trim()).filter(Boolean)))];
+}
+async function groupTC(){
+  const gs=await groups("primary_location.source.id","primary_location.source.type:journal");
+  if(gs&&gs.length){const ct=await enrich("sources",gs);
+    return gs.map(g=>{const s=ct[g.key]||{};return{"Tên tạp chí":g.key_display_name,"Số bài về chủ đề này":g.count,"Nhà xuất bản":s.host_organization_name||"","Quốc gia":s.country_code||"",
+      "Truy cập mở":s.is_oa?"Có":"Không","Chỉ số h":Number((s.summary_stats||{}).h_index||0),"Trang chủ tạp chí":s.homepage_url||null,"Trang OpenAlex":g.key}})}
+  S.dp.add("tc");return(await crTongHop())[0].map(([k,v])=>({"Tên tạp chí":k,"Số bài về chủ đề này":v,"Tra cứu tạp chí":"https://www.google.com/search?q="+encodeURIComponent(`"${k}" tạp chí`)}));
+}
+async function groupTG(){
+  const gs=await groups("authorships.author.id");
+  if(gs&&gs.length){const ct=await enrich("authors",gs);
+    return gs.map(g=>{const a=ct[g.key]||{},ins=(a.last_known_institutions||[])[0]||{};return{"Tác giả":g.key_display_name,"Số bài về chủ đề này":g.count,"Cơ quan":ins.display_name||"","Quốc gia":ins.country_code||"",
+      "Tổng số bài":Number(a.works_count||0),"Tổng trích dẫn":Number(a.cited_by_count||0),"Trang tác giả":a.orcid||g.key}})}
+  S.dp.add("tg");return(await crTongHop())[1].map(([k,v])=>({"Tác giả":k,"Số bài về chủ đề này":v,"Tra cứu tác giả":"https://scholar.google.com/scholar?q="+encodeURIComponent(`author:"${k}"`)}));
+}
+async function groupCD(){
+  const gs=await groups("primary_topic.id");if(!gs||!gs.length)return[];const ct=await enrich("topics",gs);
+  return gs.map(g=>{const t=ct[g.key]||{};return{"Chủ đề liên quan":g.key_display_name,"Lĩnh vực":(t.field||{}).display_name||"","Nhóm ngành":(t.subfield||{}).display_name||"","Số bài":g.count,"Trang OpenAlex":g.key}});
+}
+
+/* ---------- Dựng HTML ---------- */
+const lk=(u,t,s)=>u&&String(u).startsWith("http")?`<a class="lk${s?" s":""}" href="${E(u)}" target="_blank" rel="noopener">${ic(t==="Tải PDF"?"dl":"ext")}${E(t)}</a>`:"";
+const sec=(t,n)=>`<div class="sec">${E(t)}${n?`<small>${E(n)}</small>`:""}</div>`;
+const msg=(t,w)=>`<div class="msg${w?" w":""}">${t}</div>`;
+function the(r,ct=false,fa=false){
+  REG.set(keyOf(r),r);
+  const tg=String(r["Tác giả, năm"]||"").replace(/,\s*(?:\d{4})?\s*$/,""),pdf=r["Link PDF"];let tags="";
+  if(pdf)tags+=`<span class="tag ok">${ic("pdf")}PDF</span>`;
+  if(r._cites)tags+=`<span class="tag">${Number(r._cites).toLocaleString("en-US")} trích dẫn</span>`;
+  if(r._loai)tags+=`<span class="tag">${E(r._loai)}</span>`;
+  const det=ct?`<details><summary>Phương pháp, cỡ mẫu và kết quả chính</summary><p><b>Phương pháp, cỡ mẫu</b>${E(r["Phương pháp và cỡ mẫu"])}</p><p><b>Kết quả chính</b>${E(r["Kết quả chính"])}</p>${(S.apa||fa)?`<p><b>APA</b>${apa(r)}</p>`:""}</details>`:"";
+  return`<article class="ent${pdf?" ok":""}"><div class="yr">${E(r._nam)||"–"}</div><div class="bd"><div class="ti">${E(r._tieu||"(không có tên)")}</div>`+
+    (tg?`<p class="au">${E(tg)}</p>`:"")+(r._tc?`<p class="jr">${E(r._tc)}</p>`:"")+`<div class="tags">${tags}</div><div class="acts">${lk(pdf,"Tải PDF")}${lk(r["Link bài viết"],"Mở bài viết",!!pdf)}${svBtn(r)}</div>${det}</div></article>`;
+}
+function bang(rows,rong="Không có kết quả.",luu=false){
+  if(!rows.length)return msg(E(rong));
+  const cols=Object.keys(rows[0]).filter(c=>!c.startsWith("_"));
+  const head=cols.map(c=>`<th>${E(c)}</th>`).join("")+(luu?"<th>Kệ</th>":"");
+  const body=rows.map(r=>"<tr>"+cols.map(c=>{const v=r[c],lb=E(c);
+    if(c in LINK_NHAN)return`<td class="l" data-label="${lb}">${typeof v==="string"&&v.startsWith("http")?`<a href="${E(v)}" target="_blank" rel="noopener">${LINK_NHAN[c]}</a>`:""}</td>`;
+    if(c==="APA")return`<td class="w" data-label="${lb}">${v||""}</td>`;
+    if(c==="STT"||c==="Trích dẫn"||c==="Năm"||typeof v==="number")return`<td class="n" data-label="${lb}">${E(v)}</td>`;
+    return`<td data-label="${lb}"><div class="cl">${E(typeof v==="string"?v:"")}</div></td>`}).join("")+(luu?svCell(r):"")+"</tr>").join("");
+  return`<div class="tw"><table class="tb"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+async function trang(s,key,cmp){
+  const p=S.pg[key]||1;await ensure(s,p*PAGE+1);const it=cmp?[...s.items].sort(cmp):s.items;
+  return{p,rows:it.slice((p-1)*PAGE,p*PAGE),next:it.length>p*PAGE};
+}
+function dieuHuong(key,p,n,next){
+  const a=PAGE*(p-1)+1;
+  return`<div class="pg"><button class="btn" data-nav="${key}:-1" ${p<=1?"disabled":""}>${ic("l")}Trước</button><button class="btn" data-nav="${key}:1" ${next?"":"disabled"}>Sau${ic("r","r")}</button>
+  <span class="cap">Trang ${p}, kết quả ${a} đến ${a+n-1}${next?"":", đã hết kết quả"}</span></div>`;
+}
+async function hienNguon(s,key,rong,kieu="the"){
+  const{p,rows,next}=await trang(s,key);
+  if(!rows.length)return msg(E(rong));
+  return(kieu==="bang"?bang(rows):rows.map(r=>the(r)).join(""))+dieuHuong(key,p,rows.length,next);
+}
+const toApaRows=rows=>rows.map(r=>({...r,APA:apa(r)}));
+const plain=h=>{const d=document.createElement("div");d.innerHTML=h;return d.textContent};
+function csvText(rows){
+  const cols=Object.keys(rows[0]||{}).filter(c=>!c.startsWith("_")),q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+  return"\ufeff"+[cols.map(q).join(","),...rows.map(r=>cols.map(c=>q(r[c])).join(","))].join("\r\n");
+}
+function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click()}
+
+/* ---------- Vẽ trang ---------- */
+const main=$("#main");
+function trangChu(){
+  const rc=recents(),chip=t=>`<button class="chip" data-vd="${E(t)}">${E(t)}</button>`;
+  main.innerHTML=`<div class="welcome"><h1>Tra cứu <em>tài liệu</em> học thuật nhanh gọn</h1><p>Gộp OpenAlex và Crossref, ưu tiên bài uy tín, lọc riêng các bài có PDF mở được.</p></div>
+  <div class="lbl">Gợi ý để bắt đầu</div><div class="chips">${VI_DU.map(chip).join("")}</div>
+  ${rc.length?`<div class="lbl">Tìm gần đây</div><div class="chips">${rc.map(chip).join("")}</div>`:""}
+  <p class="tip"><b>Mẹo:</b> gõ từ khóa tiếng Anh để ra nhiều bài hơn. Bài nào ưng thì bấm “Lưu” để cất vào Kệ sách, rồi xuất danh mục APA một lần.</p>`;
+}
+async function render(){
+  const kq=S.kq;if(!kq)return trangChu();
+  const tok=++S.tok,tab=S.tab;let h="";
+  const draw=x=>{if(tok===S.tok)main.innerHTML=x};
+  drawTabs();const nav="";
+  const spin=nav+'<div class="spin">Đang tải...</div>';
+  draw(spin);
+  await ensure(kq.bai,PAGE+1);if(tok!==S.tok)return;
+  const rowsAll=kq.bai.items,nPdf=rowsAll.filter(r=>r["Link PDF"]).length;
+  let top=`<div class="strip"><span><b>${rowsAll.length.toLocaleString("en-US")}</b>bài đã tải</span><span><b>${nPdf}</b>có PDF mở được</span></div>`;
+  if(/[ăâđêôơưàáạảãằắặẳẵầấậẩẫèéẹẻẽềếệểễìíịỉĩòóọỏõồốộổỗờớợởỡùúụủũừứựửữỳýỵỷỹ]/i.test(S.q))top+=msg("Từ khóa tiếng Việt có thể ra ít bài, bạn thử gõ tiếng Anh xem.");
+  draw(top+spin);
+  if(tab===0){
+    const{p,rows,next}=await trang(kq.bai,"bai",CMP[S.sort]);
+    if(!rows.length)h=msg("Chưa tìm đủ tài liệu hợp lệ",true);
+    else{
+      const pageShow=S.apa?toApaRows(rows):rows;
+      h=`<div class="tools"><div class="seg">${["Bảng","Danh sách"].map(k=>`<button data-kieu="${k}" class="${S.kieu===k?"on":""}">${k}</button>`).join("")}</div>
+        <div class="seg" title="Sắp xếp trong số bài đã tải">${Object.keys(CMP).map(k=>`<button data-sort="${k}" class="${S.sort===k?"on":""}">${k}</button>`).join("")}</div>
+        <label class="tg" title="Thêm cột trích dẫn APA vào bảng, danh sách và file CSV"><input type="checkbox" id="apa" ${S.apa?"checked":""}><i></i>APA</label>
+        <button class="btn" data-dl="csv">${ic("dl")}CSV</button>${S.apa?`<button class="btn" data-dl="apa">${ic("dl")}APA (Word)</button>`:""}</div>`+
+        (S.kieu==="Danh sách"?pageShow.map(r=>the(r,true)).join(""):bang(pageShow,undefined,true)+'<div class="cap">Bấm vào ô văn bản dài để xem đầy đủ.</div>')+dieuHuong("bai",p,rows.length,next);
+    }
+  }else if(tab===1){
+    h=sec("Được trích dẫn nhiều nhất","về chủ đề này")+await hienNguon(kq.cite,"cite","Không thấy bài nào cho chủ đề này.")+
+      sec("Bài liên quan","tới các kết quả đầu tiên")+await hienNguon(kq.lq,"lq","OpenAlex chưa có gợi ý bài liên quan cho chủ đề này.");
+  }else if(tab===2){
+    h=sec("Tạp chí đăng nhiều bài","về chủ đề này")+await hienNguon(kq.tcs,"tc","Không có kết quả.","bang")+
+      (S.dp.has("tc")?'<div class="cap">Số liệu tạm tính từ khoảng 200 bài đầu trên Crossref, chưa có nhà xuất bản và chỉ số h.</div>':"");
+  }else if(tab===3){
+    h='<div class="cap">Tìm riêng từng loại tài liệu (từ 1990) trên OpenAlex và Crossref. Luận văn tiếng Việt xem thêm ở tab “Tìm ở nơi khác”.</div>';
+    for(let i=0;i<LOAI_TL.length;i++)h+=sec(LOAI_TL[i][0])+await hienNguon(kq.lv[i],"lv"+i,`Không thấy ${LOAI_TL[i][0].toLowerCase()} cho chủ đề này. Thử từ khóa tiếng Anh hoặc mở tab “Tìm ở nơi khác”.`);
+  }else if(tab===4){
+    h=sec("Tác giả nổi bật")+await hienNguon(kq.tgs,"ta","Không có kết quả.","bang")+
+      (S.dp.has("tg")?'<div class="cap">Số liệu tạm tính từ khoảng 200 bài đầu trên Crossref, chưa có cơ quan và số trích dẫn.</div>':"")+
+      sec("Chủ đề liên quan")+await hienNguon(kq.cds,"cd","Không có kết quả.","bang");
+  }else if(tab===5){
+    const q=encodeURIComponent(S.q),G=(t,l)=>sec(t)+`<div class="lkg">${l.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${n}</a>`).join("")}</div>`;
+    h='<div class="cap">Xếp từ nguồn đáng tin nhất xuống nguồn cần tự kiểm tra.</div>'+
+      G("Cơ sở dữ liệu học thuật uy tín",[["PubMed (y học)","https://pubmed.ncbi.nlm.nih.gov/?term="+q],["ERIC (giáo dục)","https://eric.ed.gov/?q="+q],["Google Scholar","https://scholar.google.com/scholar?q="+q],["Semantic Scholar","https://www.semanticscholar.org/search?q="+q]])+
+      G("Kho học thuật mở của trường, viện",[["CORE (kho PDF mở)","https://core.ac.uk/search?q="+q],["BASE (kho học thuật mở)","https://www.base-search.net/Search/Results?lookfor="+q],["OATD (luận văn truy cập mở)","https://oatd.org/oatd/search?q="+q+"&form=basic"]])+
+      G("Tiếng Việt",[["Google Scholar tiếng Việt","https://scholar.google.com/scholar?q="+q+"&hl=vi&lr=lang_vi"],["Tạp chí VJOL","https://www.google.com/search?q="+q+"+site%3Avjol.info.vn"],["Luận văn .edu.vn (PDF)","https://www.google.com/search?q="+q+"+luận+văn+site%3Aedu.vn+filetype%3Apdf"]])+
+      G("Sách",[["Google Books","https://www.google.com/search?tbm=bks&q="+q],["Open Library","https://openlibrary.org/search?q="+q]])+
+      G("Tìm rộng trên web, cần tự kiểm tra nguồn",[["Google: tìm file PDF","https://www.google.com/search?q="+q+"+filetype%3Apdf"],["Google: luận văn PDF","https://www.google.com/search?q="+q+"+thesis+OR+dissertation+filetype%3Apdf"],["ResearchGate (qua Google)","https://www.google.com/search?q="+q+"+site%3Aresearchgate.net"]]);
+  }else{h=shelfHtml()}
+  if(tok!==S.tok)return;
+  const loi=[...oaLoi].filter(c=>c!==200);
+  if(loi.length)top+=msg(`OpenAlex đang giới hạn lượt tra cứu (mã ${loi.sort().join(", ")}), nên mình đã lấy kết quả từ Crossref thay thế. Phần chủ đề và bài liên quan có thể chưa hiện đủ.`,true);
+  draw(top+nav+h);
+}
+
+function shelfHtml(){
+  const L=S.shelf;
+  if(!L.length)return`<div class="empty">${ic("bm")}<h3>Kệ sách còn trống</h3><p>Bấm “Lưu” ở bất kỳ bài nào để gom về đây. Kệ được nhớ ngay trên máy bạn, lần sau mở lại vẫn còn.</p></div>`;
+  return`<div class="tools"><button class="btn" data-dl="scsv">${ic("dl")}CSV</button><button class="btn" data-dl="sapa">${ic("dl")}APA (Word)</button><button class="btn" data-clear="1">${ic("trash")}Xóa hết</button></div>`+L.map(r=>the(r,true,true)).join("");
+}
+function shelfHome(){main.innerHTML=`<h2 class="sec">Kệ sách<small>${S.shelf.length} bài đã lưu</small></h2>`+shelfHtml()}
+function refresh(){if(S.kq)render();else if(S.tab===6)shelfHome();else trangChu()}
+
+/* ---------- Sự kiện ---------- */
+function chay(){
+  const q=$("#q").value.trim();if(!q)return;rec(q);
+  const k=KHOANG[S.kt][1];
+  if(k==="x"){let a=+$("#y1").value||1990,b=+$("#y2").value||NOW;if(a>b)[a,b]=[b,a];S.y1=a;S.y2=b}
+  else{S.y2=NOW;S.y1=k?NOW-k:1990}
+  document.body.classList.add("searched");Object.assign(S,{q,pdf:$("#pdf").checked,pg:{},dp:new Set()});oaLoi.clear();buildKq();render();
+}
+function veKt(){
+  $("#kt").innerHTML=KHOANG.map(([t],i)=>`<button type="button" data-kt="${i}" class="${i===S.kt?"on":""}">${t}</button>`).join("");
+  $("#yrs").hidden=KHOANG[S.kt][1]!=="x";
+}
+$("#f").onsubmit=e=>{e.preventDefault();chay()};
+$("#kt").onclick=e=>{const i=e.target.dataset.kt;if(i==null)return;S.kt=+i;veKt();if(S.q)chay()};
+$("#pdf").onchange=()=>{if(S.q)chay()};
+["#y1","#y2"].forEach(s=>$(s).onchange=()=>{if(S.q)chay()});
+main.onclick=e=>{
+  const cl=e.target.closest(".cl");if(cl&&!e.target.closest("a,button")){cl.classList.toggle("open");return}
+  const t=e.target.closest("[data-tab],[data-kieu],[data-nav],[data-vd],[data-dl],[data-save],[data-clear],[data-sort]");if(!t)return;const d=t.dataset;
+  if(d.save){const i=S.shelf.findIndex(x=>keyOf(x)===d.save);let on;
+    if(i>=0){S.shelf.splice(i,1);on=false}else{const r=REG.get(d.save);if(!r)return;S.shelf.push(JSON.parse(JSON.stringify(r)));on=true}
+    saveShelf();t.classList.toggle("on",on);t.innerHTML=ic(on?"bmf":"bm")+(on?"Đã lưu":"Lưu");updShelf();if(S.tab===6||(!S.kq&&!on))refresh();return}
+  if(d.clear){if(confirm("Xóa hết bài trong kệ sách?")){S.shelf=[];saveShelf();updShelf();refresh()}return}
+  if(d.sort){S.sort=d.sort;S.pg.bai=1;render();return}
+  if(d.vd){$("#q").value=d.vd;chay()}
+  else if(d.tab!=null){S.tab=+d.tab;render()}
+  else if(d.kieu){S.kieu=d.kieu;render()}
+  else if(d.nav){const[k,dx]=d.nav.split(":");S.pg[k]=Math.max(1,(S.pg[k]||1)+ +dx);render()}
+  else if(d.dl==="scsv"){download("ke_sach.csv",csvText(S.shelf.map(r=>({...r,APA:apa(r,false)}))),"text/csv")}
+  else if(d.dl==="sapa"){download("ke_sach_APA.html",apaDoc(S.shelf),"text/html")}
+  else if(d.dl==="csv"){const rows=S.kq.bai.items;download("danh_muc_tai_lieu.csv",csvText(S.apa?rows.map(r=>({...r,APA:apa(r,false)})):rows),"text/csv")}
+  else if(d.dl==="apa"){const ps=S.kq.bai.items.map(r=>apa(r)).sort((a,b)=>plain(a).localeCompare(plain(b))).map(x=>`<p style="margin-left:36pt;text-indent:-36pt">${x}</p>`).join("");
+    download("tai_lieu_tham_khao_APA.html",`<html><head><meta charset="utf-8"><title>Tài liệu tham khảo</title></head><body style="font-family:'Times New Roman',serif;font-size:12pt;line-height:2"><h3>Tài liệu tham khảo</h3>${ps}</body></html>`,"text/html")}
+};
+main.onchange=e=>{if(e.target.id==="apa"){S.apa=e.target.checked;render()}};
+$("#y2").value=NOW;S.shelf=loadShelf();veKt();updShelf();
+$("#shelfbtn").onclick=()=>{S.tab=6;if(S.kq)render();else{shelfHome();drawTabs()}scrollTo({top:0,behavior:"smooth"})};
+$("#tabs").onclick=e=>{const b=e.target.closest("[data-tab]");if(!b)return;const i=+b.dataset.tab;
+  if(!S.kq&&i!==6){$("#q").focus();return}S.tab=i;if(S.kq)render();else{shelfHome();drawTabs()}scrollTo({top:0,behavior:"smooth"})};
+drawTabs();
+trangChu();
+</script>
+<script src="config.js"></script>
+<script src="site.js" defer></script>
+</body>
+</html>

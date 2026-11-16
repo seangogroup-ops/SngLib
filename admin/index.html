@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>SngLib · Quản trị</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%23101010'/%3E%3Cg fill='%23facc15' stroke='%23facc15' stroke-width='1.4' stroke-linejoin='round'%3E%3Cpath d='M10 6.5C6.5 7.5 4.5 10 4.5 13.5V18H10v-5.5H7.3c0-2 1-3.3 2.7-4z'/%3E%3Cpath d='M19.5 6.5C16 7.5 14 10 14 13.5V18h5.5v-5.5h-2.7c0-2 1-3.3 2.7-4z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;--bg:#f3f3f0;--panel:#fff;--ink:#101010;--mut:#585852;--line:#e0e0da;--soft:#eeeee9;--btn:#101010;--btnfg:#fff;--lime:#facc15;--ring:#a16207;--side:#0e0e0d;--sidemut:#a3a39a;--ok:#15803d;--bad:#b91c1c;--bar:#101010;--bar2:#a16207;--sh:0 1px 2px rgba(0,0,0,.05),0 8px 22px -12px rgba(0,0,0,.18)}
+@media (prefers-color-scheme:dark){:root{--bg:#0a0a09;--panel:#141413;--ink:#f3f3ee;--mut:#adada3;--line:#2b2b27;--soft:#1e1e1b;--btn:#facc15;--btnfg:#101010;--ring:#facc15;--side:#050505;--ok:#4ade80;--bad:#f87171;--bar:#facc15;--bar2:#f3f3ee;--sh:0 1px 2px rgba(0,0,0,.5),0 8px 22px -12px rgba(0,0,0,.8)}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+[hidden]{display:none!important}
+h1,h2,h3{margin:0;letter-spacing:-.02em}
+.btn{cursor:pointer;border:0;background:var(--btn);color:var(--btnfg);font-weight:700;padding:.65rem 1.1rem;border-radius:12px;transition:.12s;white-space:nowrap}
+.btn:hover{filter:brightness(1.15)}
+.btn.ghost{background:var(--panel);color:var(--ink);border:2px solid var(--line)}
+.btn.ghost:hover{border-color:var(--ring);filter:none}
+.btn.danger{background:transparent;color:var(--bad);border:2px solid var(--line)}
+.btn.sm{padding:.35rem .75rem;font-size:.88rem;border-radius:10px}
+.btn[disabled]{opacity:.55;cursor:wait}
+.field{display:grid;gap:.35rem;margin-bottom:1rem}
+.field>span{font-weight:700;font-size:.92rem}
+.field small{color:var(--mut)}
+input[type=text],input[type=email],input[type=password],input[type=url],input[type=number],input[type=datetime-local],select,textarea{width:100%;padding:.7rem .85rem;border-radius:12px;border:2px solid var(--line);background:var(--panel);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ring)}
+textarea{min-height:5.5rem;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+.chk{display:flex;gap:.6rem;align-items:center;font-weight:600;margin-bottom:1rem;cursor:pointer}
+.chk input{width:1.15rem;height:1.15rem;accent-color:var(--ring)}
+/* đăng nhập / cài đặt */
+.center{min-height:100vh;display:grid;place-items:center;padding:20px}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:22px;padding:1.6rem;box-shadow:var(--sh);width:100%;max-width:440px}
+.card.wide{max-width:680px}
+.brand{display:flex;align-items:center;gap:.75rem;font-weight:800;font-size:1.3rem;margin-bottom:1.2rem;color:inherit;text-decoration:none}
+.logo{width:2.4rem;height:2.4rem;border-radius:13px;background:var(--lime);color:#101010;display:grid;place-items:center;flex:none}
+.logo svg{width:1.4rem;height:1.4rem}
+.err{color:var(--bad);font-weight:600;margin:.2rem 0 .8rem;min-height:1.2em}
+pre,code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.88em}
+pre{background:var(--soft);padding:.9rem 1rem;border-radius:12px;overflow:auto}
+ol{padding-left:1.2rem}
+/* khung quản trị */
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;background:var(--side);color:#f1f1ec;padding:24px 14px;display:flex;flex-direction:column;gap:22px}
+.side .brand{color:#fff;padding:0 .5rem;margin:0}
+.side nav{display:flex;flex-direction:column;gap:4px}
+.side nav button{display:flex;align-items:center;gap:.7rem;background:none;border:0;color:var(--sidemut);font-weight:600;padding:.75rem .9rem;border-radius:12px;cursor:pointer;text-align:left}
+.side nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+.side nav button.on{background:var(--lime);color:#101010}
+.side nav svg{width:1.2rem;height:1.2rem;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.side .who{margin-top:auto;font-size:.85rem;color:var(--sidemut);display:grid;gap:.6rem;padding:0 .5rem;word-break:break-all}
+.side .who a{color:#f1f1ec}
+.main{min-width:0;padding:26px clamp(14px,3vw,40px) 64px;max-width:1200px;width:100%}
+.head{display:flex;flex-wrap:wrap;gap:.8rem 1rem;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.head h1{font-size:1.7rem}
+.tools{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+.tools select{width:auto;padding:.55rem .8rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.8rem;margin-bottom:1rem}
+.stat{background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:1rem 1.1rem;box-shadow:var(--sh)}
+.stat small{display:block;color:var(--mut);font-weight:600}
+.stat b{display:block;font-size:2rem;line-height:1.15;font-weight:800;letter-spacing:-.03em;margin-top:.15rem}
+.stat.live{background:var(--lime);border-color:var(--lime);color:#101010}
+.stat.live small{color:#3b3004}
+.dot{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;background:#16a34a;margin-right:.4rem;box-shadow:0 0 0 0 rgba(22,163,74,.6);animation:pl 1.8s infinite}
+@keyframes pl{70%{box-shadow:0 0 0 .55rem rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:20px;padding:1.1rem 1.2rem;box-shadow:var(--sh);margin-bottom:1rem}
+.panel h3{font-size:1.05rem;margin-bottom:.8rem;display:flex;justify-content:space-between;gap:1rem;align-items:baseline}
+.panel h3 small{font-weight:500;color:var(--mut)}
+.legend{display:flex;gap:1rem;font-size:.88rem;color:var(--mut);margin-bottom:.4rem}
+.legend i{display:inline-block;width:.8rem;height:.8rem;border-radius:3px;margin-right:.35rem;vertical-align:-.1em}
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.chart text{fill:var(--mut);font-size:11px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem}
+.cols .panel{margin:0}
+.lst{display:grid;gap:.55rem}
+.li{position:relative;display:flex;justify-content:space-between;gap:1rem;padding:.4rem .7rem;border-radius:10px;overflow:hidden;font-size:.95rem}
+.li i{position:absolute;inset:0 auto 0 0;background:var(--soft);z-index:0;border-radius:10px}
+.li span,.li b{position:relative;z-index:1}
+.li span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{color:var(--mut);padding:.4rem 0}
+.item{display:flex;gap:1rem;align-items:flex-start;justify-content:space-between;background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:1rem 1.1rem;margin-bottom:.7rem;box-shadow:var(--sh)}
+.item .t{min-width:0}
+.item .t b{display:block;word-break:break-word}
+.item .t p{margin:.2rem 0 0;color:var(--mut);font-size:.93rem;white-space:pre-line;word-break:break-word}
+.item .t a{color:var(--ring);font-size:.9rem;word-break:break-all}
+.item .acts{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:flex-end;flex:none}
+.tag{display:inline-block;font-size:.76rem;font-weight:800;padding:.1rem .55rem;border-radius:99px;margin-right:.4rem;vertical-align:.1em;background:var(--soft);color:var(--mut)}
+.tag.on{background:#dcfce7;color:#14532d}.tag.warn{background:#ffedd5;color:#9a3412}
+@media (prefers-color-scheme:dark){.tag.on{background:#14321f;color:#86efac}.tag.warn{background:#3a2210;color:#fdba74}}
+dialog{border:2px solid var(--line);border-radius:22px;background:var(--panel);color:var(--ink);padding:1.4rem;width:min(560px,calc(100vw - 24px));box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog h2{font-size:1.3rem;margin-bottom:1rem}
+.dlgfoot{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--btn);color:var(--btnfg);padding:.7rem 1.2rem;border-radius:14px;font-weight:700;z-index:50;box-shadow:var(--sh);max-width:calc(100vw - 24px)}
+#toast.bad{background:var(--bad);color:#fff}
+.spin{color:var(--mut);padding:2rem 0;text-align:center}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 14px;gap:10px 14px}
+  .side nav{flex-direction:row;overflow-x:auto;flex:1 1 100%;order:3}
+  .side nav button{flex:none}
+  .side .who{margin:0 0 0 auto;display:flex;align-items:center;gap:.8rem}
+  .side .who span{display:none}
+  .row{grid-template-columns:1fr}
+  .item{flex-direction:column}
+  .item .acts{justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<!-- Chưa cấu hình -->
+<div class="center" id="setup" hidden>
+  <div class="card wide">
+    <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M10 6.5C6.5 7.5 4.5 10 4.5 13.5V18H10v-5.5H7.3c0-2 1-3.3 2.7-4z"/><path d="M19.5 6.5C16 7.5 14 10 14 13.5V18h5.5v-5.5h-2.7c0-2 1-3.3 2.7-4z"/></svg></span>SngLib · Quản trị</div>
+    <h2 style="margin-bottom:.6rem">Chưa kết nối Supabase</h2>
+    <p>Trang quản trị cần một cơ sở dữ liệu để lưu thống kê, thông báo và liên kết.</p>
+    <ol>
+      <li>Tạo dự án trên <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a>.</li>
+      <li>Mở <b>SQL Editor</b>, dán toàn bộ file <code>supabase/schema.sql</code> rồi chạy.</li>
+      <li>Điền <code>SUPABASE_URL</code> và <code>SUPABASE_ANON_KEY</code> vào <code>config.js</code> ở thư mục gốc, rồi push lại.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- Đăng nhập -->
+<div class="center" id="login" hidden>
+  <div class="card">
+    <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M10 6.5C6.5 7.5 4.5 10 4.5 13.5V18H10v-5.5H7.3c0-2 1-3.3 2.7-4z"/><path d="M19.5 6.5C16 7.5 14 10 14 13.5V18h5.5v-5.5h-2.7c0-2 1-3.3 2.7-4z"/></svg></span>SngLib · Quản trị</div>
+    <form id="lf" autocomplete="on">
+      <label class="field"><span>Email</span><input type="email" id="em" required autocomplete="username"></label>
+      <label class="field"><span>Mật khẩu</span><input type="password" id="pw" required autocomplete="current-password"></label>
+      <div class="err" id="lerr" role="alert"></div>
+      <button class="btn" style="width:100%" id="lbtn">Đăng nhập</button>
+    </form>
+  </div>
+</div>
+
+<!-- Ứng dụng -->
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <a class="brand" href="../"><span class="logo"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M10 6.5C6.5 7.5 4.5 10 4.5 13.5V18H10v-5.5H7.3c0-2 1-3.3 2.7-4z"/><path d="M19.5 6.5C16 7.5 14 10 14 13.5V18h5.5v-5.5h-2.7c0-2 1-3.3 2.7-4z"/></svg></span>Quản trị</a>
+    <nav id="nav">
+      <button data-t="stats" class="on"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Thống kê</button>
+      <button data-t="ann"><svg viewBox="0 0 24 24"><path d="M4 10v4h3l7 4V6L7 10zM18 9a4 4 0 0 1 0 6"/></svg>Thông báo</button>
+      <button data-t="links"><svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg>Liên kết</button>
+    </nav>
+    <div class="who"><span id="who"></span><a href="../">← Về trang chính</a><a href="#" id="out">Đăng xuất</a></div>
+  </aside>
+  <main class="main" id="view"></main>
+</div>
+
+<dialog id="dlg"></dialog>
+<div id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="../config.js"></script>
+<script>
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const nf=n=>Number(n||0).toLocaleString("vi-VN");
+const C=window.SNGLIB||{};
+let db,tab="stats",days=30,timer=null,user=null;
+
+function toast(m,bad){const t=$("#toast");t.textContent=m;t.className=bad?"bad":"";t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,3200)}
+function show(id){["setup","login","app"].forEach(x=>$("#"+x).hidden=x!==id)}
+const safeUrl=u=>{u=(u||"").trim();return /^(https?:\/\/|mailto:|\/|\.\/|#)/i.test(u)?u:""};
+
+/* ---------- Khởi động ---------- */
+async function boot(){
+  if(!C.SUPABASE_URL||!C.SUPABASE_ANON_KEY||!window.supabase)return show("setup");
+  db=supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY);
+  const{data:{session}}=await db.auth.getSession();
+  if(session)await enter(session.user);else show("login");
+}
+async function enter(u){
+  const{data,error}=await db.rpc("is_admin");
+  if(error||data!==true){
+    await db.auth.signOut();show("login");
+    $("#lerr").textContent=error?"Lỗi: "+error.message:"Tài khoản này chưa được cấp quyền admin.";
+    return;
+  }
+  user=u;$("#who").textContent=u.email;
+  try{localStorage.setItem("sl_ignore","1")}catch(e){}   // không tính lượt truy cập của chính admin
+  show("app");go(tab);
+}
+$("#lf").onsubmit=async e=>{
+  e.preventDefault();const b=$("#lbtn");b.disabled=true;$("#lerr").textContent="";
+  const{data,error}=await db.auth.signInWithPassword({email:$("#em").value.trim(),password:$("#pw").value});
+  b.disabled=false;
+  if(error){$("#lerr").textContent="Sai email hoặc mật khẩu.";return}
+  $("#pw").value="";await enter(data.user);
+};
+$("#out").onclick=async e=>{
+  e.preventDefault();clearInterval(timer);await db.auth.signOut();
+  try{localStorage.removeItem("sl_ignore")}catch(e){}
+  show("login");
+};
+$("#nav").onclick=e=>{const b=e.target.closest("button");if(b)go(b.dataset.t)};
+function go(t){
+  tab=t;clearInterval(timer);
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));
+  ({stats:viewStats,ann:viewAnn,links:viewLinks})[t]();
+}
+const fail=e=>toast(e&&e.message?e.message:"Có lỗi xảy ra",true);
+
+/* ---------- Thống kê ---------- */
+async function viewStats(){
+  const v=$("#view");
+  v.innerHTML=`<div class="head"><h1>Thống kê truy cập</h1><div class="tools">
+    <select id="dsel">${[7,30,90,365].map(d=>`<option value="${d}" ${d===days?"selected":""}>${d} ngày qua</option>`).join("")}</select>
+    <button class="btn ghost" id="rf">Tải lại</button></div></div><div id="sb"><div class="spin">Đang tải...</div></div>`;
+  $("#dsel").onchange=e=>{days=+e.target.value;loadStats()};
+  $("#rf").onclick=loadStats;
+  await loadStats();
+  timer=setInterval(()=>{if(!document.hidden)loadStats(true)},30000);
+}
+async function loadStats(quiet){
+  const{data,error}=await db.rpc("admin_stats",{p_days:days});
+  const sb=$("#sb");if(!sb)return;
+  if(error){if(!quiet)sb.innerHTML=`<div class="panel">Không tải được thống kê: ${esc(error.message)}</div>`;return}
+  const t=data.totals;
+  const card=(l,n,c="")=>`<div class="stat ${c}"><small>${l}</small><b>${c==="live"?'<i class="dot"></i>':""}${nf(n)}</b></div>`;
+  sb.innerHTML=`<div class="grid">
+    ${card("Đang online (5 phút)",t.online,"live")}${card("Lượt xem hôm nay",t.today_views)}${card("Người truy cập hôm nay",t.today_visitors)}
+    ${card(`Lượt xem (${data.days} ngày)`,t.views)}${card(`Người truy cập (${data.days} ngày)`,t.visitors)}${card("Người mới",t.new_visitors)}${card("Lượt tìm kiếm",t.searches)}</div>
+    <div class="panel"><h3>Theo ngày <small>giờ Việt Nam</small></h3>
+      <div class="legend"><span><i style="background:var(--bar)"></i>Lượt xem</span><span><i style="background:var(--bar2)"></i>Người truy cập</span></div>${chart(data.daily)}</div>
+    <div class="panel"><h3>Giờ cao điểm <small>tổng lượt xem theo giờ trong ngày</small></h3>${hours(data.hourly)}</div>
+    <div class="cols">
+      ${list("Từ khóa tìm nhiều",data.queries)}${list("Nguồn truy cập",data.referrers)}${list("Thiết bị",data.devices)}
+      ${list("Trình duyệt",data.browsers)}${list("Hệ điều hành",data.systems)}${list("Ngôn ngữ",data.langs)}${list("Múi giờ (gần đúng vị trí)",data.zones)}
+    </div>`;
+}
+function chart(d){
+  if(!d.length)return'<div class="empty">Chưa có dữ liệu.</div>';
+  const W=900,H=260,L=40,R=10,T=10,B=28,w=W-L-R,h=H-T-B;
+  const max=Math.max(5,...d.map(x=>Math.max(x.views,x.visitors)));
+  const step=Math.pow(10,Math.floor(Math.log10(max))),top=Math.ceil(max/step)*step||5;
+  const bw=w/d.length,y=n=>T+h-n/top*h;
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Biểu đồ lượt xem theo ngày">`;
+  for(let i=0;i<=4;i++){const n=top/4*i,yy=y(n);s+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${L-6}" y="${yy+4}" text-anchor="end">${Math.round(n)}</text>`}
+  d.forEach((x,i)=>{
+    const bx=L+i*bw+bw*.12,ww=Math.max(1,bw*.76),yy=y(x.views);
+    s+=`<rect x="${bx}" y="${yy}" width="${ww}" height="${Math.max(0,T+h-yy)}" rx="${Math.min(3,ww/2)}" fill="var(--bar)"><title>${x.d}: ${x.views} lượt xem, ${x.visitors} người</title></rect>`;
+  });
+  s+=`<polyline fill="none" stroke="var(--bar2)" stroke-width="2.5" stroke-linejoin="round" points="${d.map((x,i)=>`${L+i*bw+bw/2},${y(x.visitors)}`).join(" ")}"/>`;
+  const every=Math.ceil(d.length/8);
+  d.forEach((x,i)=>{if(i%every===0||i===d.length-1)s+=`<text x="${L+i*bw+bw/2}" y="${H-8}" text-anchor="middle">${x.d.slice(8)}/${x.d.slice(5,7)}</text>`});
+  return s+"</svg>";
+}
+function hours(d){
+  const max=Math.max(1,...d.map(x=>x.n)),W=900,H=120,bw=W/24;
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H+18}" role="img" aria-label="Lượt xem theo giờ">`;
+  d.forEach(x=>{const hh=x.n/max*H;s+=`<rect x="${x.h*bw+4}" y="${H-hh}" width="${bw-8}" height="${Math.max(1,hh)}" rx="3" fill="var(--bar)" opacity="${x.n?1:.25}"><title>${x.h}h: ${x.n} lượt xem</title></rect><text x="${x.h*bw+bw/2}" y="${H+14}" text-anchor="middle">${x.h}</text>`});
+  return s+"</svg>";
+}
+function list(title,a){
+  const max=Math.max(1,...(a||[]).map(x=>x.n));
+  return`<div class="panel"><h3>${title}</h3>${a&&a.length?`<div class="lst">${a.map(x=>`<div class="li"><i style="width:${x.n/max*100}%"></i><span title="${esc(x.name)}">${esc(x.name)}</span><b>${nf(x.n)}</b></div>`).join("")}</div>`:'<div class="empty">Chưa có dữ liệu.</div>'}</div>`;
+}
+
+/* ---------- Thông báo ---------- */
+const LV={info:"Thông tin",warn:"Cảnh báo",success:"Tin vui"};
+const toLocal=iso=>{if(!iso)return"";const d=new Date(iso),p=n=>String(n).padStart(2,"0");return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`};
+const toIso=v=>v?new Date(v).toISOString():null;
+const fmt=iso=>iso?new Date(iso).toLocaleString("vi-VN",{dateStyle:"short",timeStyle:"short"}):"";
+function annState(a){
+  const n=Date.now();
+  if(!a.active)return["Đã tắt",""];
+  if(a.starts_at&&new Date(a.starts_at)>n)return["Hẹn giờ","warn"];
+  if(a.ends_at&&new Date(a.ends_at)<=n)return["Hết hạn",""];
+  return["Đang hiển thị","on"];
+}
+let anns=[];
+async function viewAnn(){
+  const v=$("#view");
+  v.innerHTML=`<div class="head"><h1>Thông báo</h1><button class="btn" id="add">+ Thông báo mới</button></div><div id="al"><div class="spin">Đang tải...</div></div>`;
+  $("#add").onclick=()=>annForm();
+  const{data,error}=await db.from("announcements").select("*").order("created_at",{ascending:false});
+  if(error)return $("#al").innerHTML=`<div class="panel">${esc(error.message)}</div>`;
+  anns=data;drawAnn();
+}
+function drawAnn(){
+  $("#al").innerHTML=anns.length?anns.map(a=>{const[l,c]=annState(a);return`<div class="item"><div class="t">
+    <b><span class="tag ${c}">${l}</span><span class="tag">${LV[a.level]||a.level}</span>${esc(a.title)}</b>
+    ${a.body?`<p>${esc(a.body)}</p>`:""}${a.link_url?`<a href="${esc(safeUrl(a.link_url))}" target="_blank" rel="noopener">${esc(a.link_label||"Xem thêm")} → ${esc(a.link_url)}</a>`:""}
+    ${a.starts_at||a.ends_at?`<p>${a.starts_at?"Từ "+fmt(a.starts_at):""} ${a.ends_at?"đến "+fmt(a.ends_at):""}</p>`:""}</div>
+    <div class="acts"><button class="btn ghost sm" data-tg="${a.id}">${a.active?"Tắt":"Bật"}</button><button class="btn ghost sm" data-ed="${a.id}">Sửa</button><button class="btn danger sm" data-del="${a.id}">Xóa</button></div></div>`}).join(""):'<div class="panel empty">Chưa có thông báo nào. Bấm “Thông báo mới” để tạo.</div>';
+  $("#al").onclick=async e=>{
+    const b=e.target.closest("button");if(!b)return;
+    const id=+(b.dataset.tg||b.dataset.ed||b.dataset.del),a=anns.find(x=>x.id===id);if(!a)return;
+    if(b.dataset.ed)return annForm(a);
+    if(b.dataset.tg){const{error}=await db.from("announcements").update({active:!a.active}).eq("id",id);if(error)return fail(error);a.active=!a.active;drawAnn();return}
+    if(b.dataset.del&&confirm(`Xóa thông báo “${a.title}”?`)){const{error}=await db.from("announcements").delete().eq("id",id);if(error)return fail(error);anns=anns.filter(x=>x.id!==id);drawAnn();toast("Đã xóa")}
+  };
+}
+function annForm(a){
+  const n=!a;a=a||{level:"info",active:true};
+  const d=$("#dlg");
+  d.innerHTML=`<form method="dialog" id="af"><h2>${n?"Thông báo mới":"Sửa thông báo"}</h2>
+    <label class="field"><span>Tiêu đề *</span><input type="text" id="f_t" maxlength="160" required value="${esc(a.title)}"></label>
+    <label class="field"><span>Nội dung</span><textarea id="f_b" maxlength="1000">${esc(a.body)}</textarea></label>
+    <div class="row"><label class="field"><span>Loại</span><select id="f_l">${Object.entries(LV).map(([k,v])=>`<option value="${k}" ${a.level===k?"selected":""}>${v}</option>`).join("")}</select></label>
+      <label class="field"><span>Chữ trên nút liên kết</span><input type="text" id="f_ll" maxlength="60" placeholder="Xem thêm" value="${esc(a.link_label)}"></label></div>
+    <label class="field"><span>Đường dẫn (tùy chọn)</span><input type="url" id="f_u" maxlength="500" placeholder="https://..." value="${esc(a.link_url)}"></label>
+    <div class="row"><label class="field"><span>Bắt đầu hiển thị</span><input type="datetime-local" id="f_s" value="${toLocal(a.starts_at)}"></label>
+      <label class="field"><span>Ngừng hiển thị</span><input type="datetime-local" id="f_e" value="${toLocal(a.ends_at)}"></label></div>
+    <label class="chk"><input type="checkbox" id="f_a" ${a.active?"checked":""}>Hiển thị cho khách</label>
+    <div class="dlgfoot"><button type="button" class="btn ghost" id="cx">Hủy</button><button class="btn" id="sv" value="x">Lưu</button></div></form>`;
+  d.showModal();
+  $("#cx").onclick=()=>d.close();
+  $("#af").onsubmit=async e=>{
+    e.preventDefault();
+    const url=$("#f_u").value.trim();
+    if(url&&!safeUrl(url))return toast("Đường dẫn phải bắt đầu bằng http(s)://",true);
+    const row={title:$("#f_t").value.trim(),body:$("#f_b").value.trim()||null,level:$("#f_l").value,link_label:$("#f_ll").value.trim()||null,link_url:url||null,
+      starts_at:toIso($("#f_s").value),ends_at:toIso($("#f_e").value),active:$("#f_a").checked};
+    if(!row.title)return toast("Cần nhập tiêu đề",true);
+    const b=$("#sv");b.disabled=true;
+    const q=n?db.from("announcements").insert(row):db.from("announcements").update(row).eq("id",a.id);
+    const{error}=await q;b.disabled=false;
+    if(error)return fail(error);
+    d.close();toast("Đã lưu");viewAnn();
+  };
+}
+
+/* ---------- Liên kết ---------- */
+let lks=[];
+async function viewLinks(){
+  const v=$("#view");
+  v.innerHTML=`<div class="head"><h1>Liên kết</h1><button class="btn" id="add">+ Thêm liên kết</button></div>
+    <p style="color:var(--mut);margin-top:-.6rem">Hiện ở cuối trang chính, sắp theo số thứ tự nhỏ → lớn.</p><div id="ll"><div class="spin">Đang tải...</div></div>`;
+  $("#add").onclick=()=>lkForm();
+  const{data,error}=await db.from("links").select("*").order("sort").order("id");
+  if(error)return $("#ll").innerHTML=`<div class="panel">${esc(error.message)}</div>`;
+  lks=data;drawLinks();
+}
+function drawLinks(){
+  $("#ll").innerHTML=lks.length?lks.map(l=>`<div class="item"><div class="t"><b><span class="tag ${l.active?"on":""}">${l.active?"Đang hiện":"Đã ẩn"}</span><span class="tag">#${l.sort}</span>${esc(l.title)}</b><a href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.url)}</a></div>
+    <div class="acts"><button class="btn ghost sm" data-tg="${l.id}">${l.active?"Ẩn":"Hiện"}</button><button class="btn ghost sm" data-ed="${l.id}">Sửa</button><button class="btn danger sm" data-del="${l.id}">Xóa</button></div></div>`).join(""):'<div class="panel empty">Chưa có liên kết nào.</div>';
+  $("#ll").onclick=async e=>{
+    const b=e.target.closest("button");if(!b)return;
+    const id=+(b.dataset.tg||b.dataset.ed||b.dataset.del),l=lks.find(x=>x.id===id);if(!l)return;
+    if(b.dataset.ed)return lkForm(l);
+    if(b.dataset.tg){const{error}=await db.from("links").update({active:!l.active}).eq("id",id);if(error)return fail(error);l.active=!l.active;drawLinks();return}
+    if(b.dataset.del&&confirm(`Xóa liên kết “${l.title}”?`)){const{error}=await db.from("links").delete().eq("id",id);if(error)return fail(error);lks=lks.filter(x=>x.id!==id);drawLinks();toast("Đã xóa")}
+  };
+}
+function lkForm(l){
+  const n=!l;l=l||{sort:(Math.max(0,...lks.map(x=>x.sort))+10),active:true};
+  const d=$("#dlg");
+  d.innerHTML=`<form method="dialog" id="lkf"><h2>${n?"Thêm liên kết":"Sửa liên kết"}</h2>
+    <label class="field"><span>Tên hiển thị *</span><input type="text" id="k_t" maxlength="80" required value="${esc(l.title)}"></label>
+    <label class="field"><span>Đường dẫn *</span><input type="url" id="k_u" maxlength="500" required placeholder="https://..." value="${esc(l.url)}"></label>
+    <label class="field"><span>Thứ tự</span><input type="number" id="k_s" step="1" value="${l.sort}"><small>Số nhỏ hiện trước.</small></label>
+    <label class="chk"><input type="checkbox" id="k_a" ${l.active?"checked":""}>Hiển thị cho khách</label>
+    <div class="dlgfoot"><button type="button" class="btn ghost" id="cx">Hủy</button><button class="btn" id="sv">Lưu</button></div></form>`;
+  d.showModal();
+  $("#cx").onclick=()=>d.close();
+  $("#lkf").onsubmit=async e=>{
+    e.preventDefault();
+    const url=$("#k_u").value.trim();
+    if(!safeUrl(url))return toast("Đường dẫn phải bắt đầu bằng http(s)://",true);
+    const row={title:$("#k_t").value.trim(),url,sort:parseInt($("#k_s").value,10)||0,active:$("#k_a").checked};
+    const b=$("#sv");b.disabled=true;
+    const{error}=await(n?db.from("links").insert(row):db.from("links").update(row).eq("id",l.id));
+    b.disabled=false;if(error)return fail(error);
+    d.close();toast("Đã lưu");viewLinks();
+  };
+}
+
+boot();
+</script>
+</body>
+</html>
