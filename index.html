@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#050505">
 <title>SngLib · thư viện tra cứu</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%2338bdf8'/%3E%3Cg fill='none' stroke='%23101010' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='5.8' stroke-width='2.1'/%3E%3Cpath d='m15 15 5.2 5.2' stroke-width='2.4'/%3E%3Cpath d='M8.1 9.3h4.8M8.1 12h3' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -209,6 +210,40 @@ a{color:inherit}
 .strip .btn{align-self:center}
 
 @media (min-width:1001px){.side{padding-top:40px}#tabs{margin-top:22px}}
+
+/* ===== tối ưu điện thoại ===== */
+@media (max-width:1000px){
+  html,body{overflow-x:clip}
+  .app{grid-template-columns:minmax(0,1fr)}
+  .col{min-width:0;width:100%;max-width:100%}
+}
+@media (max-width:768px){
+  .side{padding:12px 14px 6px;gap:8px 12px}
+  .brand{font-size:1.2rem;padding:0}
+  .logo{width:2.1rem;height:2.1rem;border-radius:11px}
+  #tabs{margin:0 -14px;padding:0 14px 8px;gap:6px}
+  #tabs button{padding:.55rem .9rem;font-size:.92rem;border-radius:99px;gap:.5rem}
+  #tabs .ic{width:1.1rem;height:1.1rem}
+  .col{padding:12px 14px 48px}
+  #f{border-radius:16px;padding:.2rem .2rem .2rem .85rem;gap:.4rem}
+  #q{padding:.7rem .2rem}
+  .go{padding:.75rem 1rem;min-height:44px}
+  .filters{gap:.7rem;margin:.8rem 0 .2rem}
+  .seg{display:flex;max-width:100%;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .seg::-webkit-scrollbar{display:none}
+  .seg button{flex:none;min-height:40px}
+  .tools{gap:.6rem}
+  .tools .seg{flex:1 1 100%}
+  .years{flex-wrap:wrap}
+  .btn,.lk,.sv{min-height:44px}
+  .tb .sv{min-height:40px}
+  .ent .ti,.ent .au,.ent .jr,.tb td,.msg,.chip,.tip{overflow-wrap:anywhere}
+  .welcome h1{font-size:1.75rem}
+  .chip{max-width:100%}
+  .tip{font-size:.95rem}
+  .pg{gap:.5rem}
+  .pg .btn{flex:1 1 40%;justify-content:center}
+}
 </style>
 </head>
 <body>
