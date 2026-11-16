@@ -257,6 +257,24 @@ a{color:inherit}
   .go{padding:.75rem 1rem}
   #f{gap:.3rem}
 }
+
+/* ===== điện thoại: thanh tab dưới đáy như ứng dụng ===== */
+.sh{display:none}
+@media (max-width:768px){
+  .side{padding:14px 16px 6px}
+  #tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;margin:0;padding:6px 2px calc(6px + env(safe-area-inset-bottom));gap:0;flex-direction:row;flex-wrap:nowrap;overflow:visible;
+    background:var(--side);border-top:1px solid rgba(255,255,255,.1)}
+  #tabs button{position:relative;flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:3px;padding:.35rem 0;border-radius:10px;font-size:.66rem;font-weight:600;line-height:1.15;text-align:center;white-space:normal;background:none}
+  #tabs button:hover{background:none}
+  #tabs button.on{background:none;color:var(--lime)}
+  #tabs .ic{display:block;width:1.4rem;height:1.4rem}
+  #tabs .full{display:none}
+  #tabs .sh{display:block;flex:none}
+  #tabs em{position:absolute;top:0;left:54%;margin:0;font-size:.6rem;padding:0 .35rem;background:var(--lime);color:#101010}
+  #kt{flex-wrap:nowrap;overflow-x:auto;padding:3px;gap:0}
+  #kt button{padding:.45rem .3rem;font-size:.76rem;flex:1 1 auto;white-space:nowrap}
+  .col{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+}
 </style>
 </head>
 <body>
@@ -307,8 +325,9 @@ function rec(q){try{localStorage.setItem(RK,JSON.stringify([q,...recents().filte
 const inShelf=r=>S.shelf.some(x=>keyOf(x)===keyOf(r));
 const svBtn=r=>{REG.set(keyOf(r),r);const on=inShelf(r);return`<button class="sv${on?" on":""}" data-save="${E(keyOf(r))}">${ic(on?"bmf":"bm")}${on?"Đã lưu":"Lưu"}</button>`};
 const svCell=r=>`<td class="l" data-label="Kệ">${svBtn(r)}</td>`;
+const SHORT=["Bài báo","Liên quan","Tạp chí","Luận văn","Tác giả","Nơi khác","Kệ sách"];
 const TIC=["doc","rel","jr","thesis","users","globe","bm"];
-function drawTabs(){const a=S.kq||S.tab===6?S.tab:-1;$("#tabs").innerHTML=TABS.map((t,i)=>`<button data-tab="${i}" class="${i===a?"on":""}">${ic(TIC[i])}<span>${t}</span>${i===6?`<em id="shc">${S.shelf.length}</em>`:""}</button>`).join("")}
+function drawTabs(){const a=S.kq||S.tab===6?S.tab:-1;$("#tabs").innerHTML=TABS.map((t,i)=>`<button data-tab="${i}" class="${i===a?"on":""}">${ic(TIC[i])}<span class="full">${t}</span><span class="sh">${SHORT[i]}</span>${i===6?`<em id="shc">${S.shelf.length}</em>`:""}</button>`).join("")}
 function updShelf(){$("#shn").textContent=S.shelf.length;const c=$("#shc");if(c)c.textContent=S.shelf.length}
 
 /* ---------- Gọi API ---------- */
