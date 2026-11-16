@@ -633,7 +633,7 @@ async function render(){
       h=`<div class="tools"><div class="seg">${["Bảng","Danh sách"].map(k=>`<button data-kieu="${k}" class="${S.kieu===k?"on":""}">${k}</button>`).join("")}</div>
         <div class="seg" title="Sắp xếp trong số bài đã tải">${Object.keys(CMP).map(k=>`<button data-sort="${k}" class="${S.sort===k?"on":""}">${k}</button>`).join("")}</div>
         <label class="tg" title="Thêm cột trích dẫn theo chuẩn APA vào bảng, danh sách và file CSV"><input type="checkbox" id="apa" ${S.apa?"checked":""}><i></i>Trích dẫn</label>${styleSeg()}
-        <button class="btn" data-dl="csv">${ic("dl")}CSV</button><button class="btn" data-dl="apa">${ic("dl")}${S.style} (Word)</button><button class="btn" data-dl="bib">${ic("dl")}BibTeX</button><button class="btn" data-dl="ris">${ic("dl")}RIS</button></div>`+
+        <button class="btn" data-dl="csv">${ic("dl")}CSV</button><button class="btn" data-dl="apa">${ic("dl")}${S.style} (Word)</button></div>`+
         (S.kieu==="Danh sách"?pageShow.map(r=>the(r,true)).join(""):bang(pageShow,undefined,true)+'<div class="cap">Bấm vào ô văn bản dài để xem đầy đủ.</div>')+dieuHuong("bai",p,rows.length,next);
     }
   }else if(tab===1){
@@ -667,7 +667,7 @@ async function render(){
 function shelfHtml(){
   const L=S.shelf;
   if(!L.length)return`<div class="empty">${ic("bm")}<h3>Kệ sách còn trống</h3><p>Bấm “Lưu” ở bất kỳ bài nào để gom về đây. Kệ được nhớ ngay trên máy bạn, lần sau mở lại vẫn còn.</p><p><button class="btn" data-imp="1">${ic("up")}Nhập từ file sao lưu</button></p></div>`;
-  return`<div class="tools">${styleSeg()}<button class="btn" data-dl="scsv">${ic("dl")}CSV</button><button class="btn" data-dl="sapa">${ic("dl")}${S.style} (Word)</button><button class="btn" data-dl="sbib">${ic("dl")}BibTeX</button><button class="btn" data-dl="sris">${ic("dl")}RIS</button></div><div class="tools"><button class="btn" data-dl="sjson" title="Tải file sao lưu để chuyển sang máy khác">${ic("dl")}Sao lưu (JSON)</button><button class="btn" data-imp="1" title="Nhập lại file sao lưu JSON">${ic("up")}Nhập sao lưu</button><button class="btn" data-clear="1">${ic("trash")}Xóa hết</button></div>`+L.map(r=>the(r,true,true)).join("");
+  return`<div class="tools">${styleSeg()}<button class="btn" data-dl="scsv">${ic("dl")}CSV</button><button class="btn" data-dl="sapa">${ic("dl")}${S.style} (Word)</button></div><div class="tools"><button class="btn" data-dl="sjson" title="Tải file sao lưu để chuyển sang máy khác">${ic("dl")}Sao lưu (JSON)</button><button class="btn" data-imp="1" title="Nhập lại file sao lưu JSON">${ic("up")}Nhập sao lưu</button><button class="btn" data-clear="1">${ic("trash")}Xóa hết</button></div>`+L.map(r=>the(r,true,true)).join("");
 }
 function shelfHome(){syncHash();main.innerHTML=`<h2 class="sec">Kệ sách<small>${S.shelf.length} bài đã lưu</small></h2>`+shelfHtml()}
 function refresh(){if(S.kq)render();else if(S.tab===6)shelfHome();else trangChu()}
