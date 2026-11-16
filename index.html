@@ -208,47 +208,20 @@ a{color:inherit}
 @media (max-width:768px){.cl{display:block;-webkit-line-clamp:unset;cursor:default}}
 .strip .btn{align-self:center}
 
-/* ===== bố cục mới: thanh đầu trang + tab ngang ===== */
-html{scroll-padding-top:130px}
-.app{display:block}
-.hd{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line)}
-.hdin{max-width:1240px;margin:0 auto;padding:12px clamp(14px,2.4vw,32px);display:flex;align-items:center;gap:1.4rem}
-.hdin.hdtabs{padding-top:0;padding-bottom:0}
-.brand{color:var(--ink);padding:0;font-size:1.35rem}
-.logo{width:2.3rem;height:2.3rem;border-radius:12px}
-.logo .ic{width:1.45rem;height:1.45rem}
-.top{flex:1;min-width:0;max-width:760px;margin-left:auto}
-#tabs{flex-direction:row;gap:.2rem;overflow-x:auto;scrollbar-width:none;width:100%}
-#tabs::-webkit-scrollbar{display:none}
-#tabs button{flex:none;white-space:nowrap;color:var(--mut);background:none;border-radius:0;border-bottom:3px solid transparent;padding:.7rem 1rem;font-size:.97rem;gap:.55rem}
-#tabs button:hover{background:none;color:var(--ink)}
-#tabs button.on{background:none;color:var(--ink);border-bottom-color:var(--lime)}
-#tabs .ic{width:1.1rem;height:1.1rem}
-#tabs em{background:var(--soft);color:var(--ink);margin-left:.1rem}
-#tabs button.on em{background:var(--lime);color:#101010}
-.col{max-width:1240px;margin:0 auto;padding:16px clamp(14px,2.4vw,32px) 48px;width:100%}
-.foot{margin-top:2.5rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--mut);font-size:.88rem}
-@media (max-width:768px){
-  .hd{position:static}
-  .hdin{flex-wrap:wrap;gap:.7rem}
-  .top{flex:1 1 100%;max-width:none;margin-left:0;order:3}
-  .shelfbtn{display:none}
-}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="hd">
-    <div class="hdin">
-      <a class="brand" href="./"><span class="logo"><svg class="ic" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.8" stroke-width="2.1"/><path d="m15 15 5.2 5.2" stroke-width="2.4"/><path d="M8.1 9.3h4.8M8.1 12h3" stroke-width="1.5"/></svg></span>SngLib</a>
-      <div class="top">
+  <aside class="side">
+    <a class="brand" href="./"><span class="logo"><svg class="ic" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.8" stroke-width="2.1"/><path d="m15 15 5.2 5.2" stroke-width="2.4"/><path d="M8.1 9.3h4.8M8.1 12h3" stroke-width="1.5"/></svg></span>SngLib</a>
+    <nav id="tabs"></nav>
+    <div class="side-foot">Dữ liệu từ OpenAlex và Crossref</div>
+  </aside>
+  <div class="col">
+    <div class="top">
       <form id="f"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg><input id="q" type="text" placeholder="Tìm bài báo, luận văn, sách..." autocomplete="off"><button class="go">Tìm<svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
       <button class="shelfbtn" id="shelfbtn" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M6 4h12v16l-6-4-6 4z"/></svg>Kệ sách<b id="shn">0</b></button>
     </div>
-    </div>
-    <div class="hdin hdtabs"><nav id="tabs"></nav></div>
-  </header>
-  <div class="col">
     <div class="filters">
       <div class="seg" id="kt"></div>
       <label class="tg" title="Chỉ giữ các bài có link PDF mở được trực tiếp"><input type="checkbox" id="pdf"><i></i>Chỉ bài có PDF</label>
@@ -256,7 +229,6 @@ html{scroll-padding-top:130px}
     <div class="years" id="yrs" hidden>Từ năm <input type="number" id="y1" value="2018" min="1900"> đến năm <input type="number" id="y2" min="1900"></div>
     <main id="main"></main>
     <input type="file" id="imp" accept=".json,application/json" hidden>
-    <footer class="foot">Dữ liệu từ OpenAlex và Crossref</footer>
   </div>
 </div>
 <script>
